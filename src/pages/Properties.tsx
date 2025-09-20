@@ -12,7 +12,7 @@ import { Search, Filter, MapPin, SlidersHorizontal } from "lucide-react";
 
 const Properties = () => {
   const [searchQuery, setSearchQuery] = useState("");
-  const [propertyType, setPropertyType] = useState("");
+  const [propertyType, setPropertyType] = useState("all");
   const [priceRange, setPriceRange] = useState([10000, 50000]);
   const [showFilters, setShowFilters] = useState(false);
 
@@ -124,7 +124,7 @@ const Properties = () => {
                     <SelectValue placeholder="Property Type" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">All Types</SelectItem>
+                    <SelectItem value="all">All Types</SelectItem>
                     <SelectItem value="pg">PG / Hostel</SelectItem>
                     <SelectItem value="apartment">Apartment</SelectItem>
                     <SelectItem value="villa">Villa</SelectItem>
