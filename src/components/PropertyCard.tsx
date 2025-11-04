@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
@@ -18,6 +19,7 @@ interface PropertyCardProps {
 }
 
 const PropertyCard = ({
+  id,
   title,
   location,
   price,
@@ -30,7 +32,8 @@ const PropertyCard = ({
   featured,
 }: PropertyCardProps) => {
   return (
-    <Card className="group overflow-hidden transition-all hover:shadow-medium cursor-pointer">
+    <Link to={`/property/${id}`}>
+      <Card className="group overflow-hidden transition-all hover:shadow-medium cursor-pointer">
       <div className="relative">
         <img
           src={image}
@@ -103,6 +106,7 @@ const PropertyCard = ({
         </Button>
       </CardFooter>
     </Card>
+    </Link>
   );
 };
 
