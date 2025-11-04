@@ -49,7 +49,7 @@ const Header = () => {
           <Button 
             size="sm" 
             className="bg-gradient-primary text-primary-foreground shadow-soft"
-            onClick={() => setPostPropertyOpen(true)} style="color:black"
+            onClick={() => setPostPropertyOpen(true)} style={{ color: "black" }}
           >
             Post Property
           </Button>
