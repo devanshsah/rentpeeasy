@@ -2,9 +2,11 @@ import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Menu, X, Home, Search, Settings, FileText, Info } from "lucide-react";
+import PostPropertyDialog from "./PostPropertyDialog";
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [postPropertyOpen, setPostPropertyOpen] = useState(false);
   const location = useLocation();
 
   const navItems = [
@@ -44,7 +46,11 @@ const Header = () => {
           <Button variant="ghost" size="sm">
             Login
           </Button>
-          <Button size="sm" className="bg-gradient-primary text-primary-foreground shadow-soft">
+          <Button 
+            size="sm" 
+            className="bg-gradient-primary text-primary-foreground shadow-soft"
+            onClick={() => setPostPropertyOpen(true)}
+          >
             Post Property
           </Button>
         </div>
@@ -77,13 +83,22 @@ const Header = () => {
               <Button variant="ghost" size="sm" className="w-full justify-start">
                 Login
               </Button>
-              <Button size="sm" className="w-full bg-gradient-primary text-primary-foreground shadow-soft">
+              <Button 
+                size="sm" 
+                className="w-full bg-gradient-primary text-primary-foreground shadow-soft"
+                onClick={() => {
+                  setPostPropertyOpen(true);
+                  setIsMenuOpen(false);
+                }}
+              >
                 Post Property
               </Button>
             </div>
           </nav>
         </div>
       )}
+      
+      <PostPropertyDialog open={postPropertyOpen} onOpenChange={setPostPropertyOpen} />
     </header>
   );
 };
