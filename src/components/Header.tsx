@@ -89,7 +89,7 @@ const Header = () => {
                 onClick={() => {
                   setPostPropertyOpen(true);
                   setIsMenuOpen(false);
-                }} style="color:black"
+                }} style={{ color: "black" }}
               >
                 Post Property
               </Button>
