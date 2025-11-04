@@ -99,7 +99,7 @@ const Hero = () => {
               <Button
                 onClick={handleSearch}
                 size="lg"
-                className="bg-gradient-primary text-primary-foreground shadow-medium hover:shadow-large transition-all"
+                className="bg-gradient-primary text-primary-foreground shadow-medium hover:shadow-large transition-all text-black"
               >
                 <Search className="h-5 w-5 mr-2" />
                 Search
