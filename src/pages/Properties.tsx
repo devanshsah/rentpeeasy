@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
+import { useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -11,9 +12,10 @@ import Footer from "@/components/Footer";
 import { Search, Filter, MapPin, SlidersHorizontal } from "lucide-react";
 
 const Properties = () => {
-  const [searchQuery, setSearchQuery] = useState("");
-  const [propertyType, setPropertyType] = useState("all");
-  const [priceRange, setPriceRange] = useState([10000, 50000]);
+  const [searchParams] = useSearchParams();
+  const [searchQuery, setSearchQuery] = useState(searchParams.get("q") || "");
+  const [propertyType, setPropertyType] = useState(searchParams.get("type") || "all");
+  const [priceRange, setPriceRange] = useState([5000, 100000]);
   const [showFilters, setShowFilters] = useState(false);
 
   const properties = [
@@ -90,6 +92,19 @@ const Properties = () => {
     "Power Backup", "Lift", "Internet", "Laundry"
   ];
 
+  const filteredProperties = useMemo(() => {
+    return properties.filter((p) => {
+      const matchesQuery = !searchQuery || 
+        p.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        p.location.toLowerCase().includes(searchQuery.toLowerCase());
+      const matchesType = propertyType === "all" || 
+        p.type.toLowerCase() === propertyType.toLowerCase();
+      const priceNum = parseInt(p.price.replace(/[^0-9]/g, ""));
+      const matchesPrice = priceNum >= priceRange[0] && priceNum <= priceRange[1];
+      return matchesQuery && matchesType && matchesPrice;
+    });
+  }, [searchQuery, propertyType, priceRange, properties]);
+
   return (
     <div className="min-h-screen">
       <Header />
@@ -103,7 +118,7 @@ const Properties = () => {
                 Find Your <span className="text-primary">Perfect Property</span>
               </h1>
               <p className="text-muted-foreground text-lg">
-                {properties.length} properties found in your area
+                {filteredProperties.length} properties found
               </p>
             </div>
 
@@ -223,7 +238,7 @@ const Properties = () => {
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center gap-4">
                 <h2 className="text-xl font-semibold">Properties</h2>
-                <Badge variant="secondary">{properties.length} found</Badge>
+                <Badge variant="secondary">{filteredProperties.length} found</Badge>
               </div>
               <Select defaultValue="newest">
                 <SelectTrigger className="w-48">
@@ -239,9 +254,18 @@ const Properties = () => {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {properties.map((property) => (
-                <PropertyCard key={property.id} {...property} />
-              ))}
+              {filteredProperties.length > 0 ? (
+                filteredProperties.map((property) => (
+                  <PropertyCard key={property.id} {...property} />
+                ))
+              ) : (
+                <div className="col-span-2 text-center py-12">
+                  <p className="text-muted-foreground text-lg">No properties found matching your criteria.</p>
+                  <Button variant="outline" className="mt-4" onClick={() => { setSearchQuery(""); setPropertyType("all"); setPriceRange([5000, 100000]); }}>
+                    Clear Filters
+                  </Button>
+                </div>
+              )}
             </div>
 
             {/* Pagination */}
