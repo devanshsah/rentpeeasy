@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -9,9 +10,14 @@ const Hero = () => {
   const [searchCity, setSearchCity] = useState("");
   const [propertyType, setPropertyType] = useState("");
   const [budgetRange, setBudgetRange] = useState("");
+  const navigate = useNavigate();
 
   const handleSearch = () => {
-    console.log({ searchCity, propertyType, budgetRange });
+    const params = new URLSearchParams();
+    if (searchCity) params.set("q", searchCity);
+    if (propertyType) params.set("type", propertyType);
+    if (budgetRange) params.set("budget", budgetRange);
+    navigate(`/properties?${params.toString()}`);
   };
 
   return (
