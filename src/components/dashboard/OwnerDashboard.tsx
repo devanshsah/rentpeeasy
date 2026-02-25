@@ -3,18 +3,19 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { DemoUser } from "@/contexts/AuthContext";
-import { Building, Eye, MessageSquare, Plus, IndianRupee, Pencil, Trash2, CheckCircle, XCircle } from "lucide-react";
+import { Building, Eye, MessageSquare, Plus, IndianRupee, Pencil, Trash2, CheckCircle, XCircle, TrendingUp, Users, BarChart3, Calendar } from "lucide-react";
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import {
-  Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogTrigger,
+  Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell } from "recharts";
 
 interface Property {
   id: number;
@@ -33,21 +34,52 @@ const INITIAL_PROPERTIES: Property[] = [
   { id: 4, title: "1BHK Flat in Indiranagar", status: "Active", views: 89, inquiries: 5, rent: "₹18,000" },
 ];
 
+const MONTHLY_VIEWS = [
+  { month: "Sep", views: 120, inquiries: 8 },
+  { month: "Oct", views: 200, inquiries: 14 },
+  { month: "Nov", views: 310, inquiries: 18 },
+  { month: "Dec", views: 280, inquiries: 22 },
+  { month: "Jan", views: 390, inquiries: 25 },
+  { month: "Feb", views: 450, inquiries: 30 },
+];
+
+const REVENUE_DATA = [
+  { month: "Sep", revenue: 15000 },
+  { month: "Oct", revenue: 25000 },
+  { month: "Nov", revenue: 40000 },
+  { month: "Dec", revenue: 55000 },
+  { month: "Jan", revenue: 70000 },
+  { month: "Feb", revenue: 85000 },
+];
+
+const OCCUPANCY_DATA = [
+  { name: "Rented", value: 1, color: "hsl(142, 76%, 36%)" },
+  { name: "Active", value: 2, color: "hsl(221, 83%, 53%)" },
+  { name: "Under Review", value: 1, color: "hsl(38, 92%, 50%)" },
+];
+
 const OwnerDashboard = ({ user }: { user: DemoUser }) => {
   const [properties, setProperties] = useState<Property[]>(INITIAL_PROPERTIES);
   const [editProperty, setEditProperty] = useState<Property | null>(null);
   const [editOpen, setEditOpen] = useState(false);
+  const [deleteId, setDeleteId] = useState<number | null>(null);
   const { toast } = useToast();
+
+  const totalViews = properties.reduce((s, p) => s + p.views, 0);
+  const totalInquiries = properties.reduce((s, p) => s + p.inquiries, 0);
+  const rentedRevenue = properties.filter(p => p.status === "Rented").reduce((s, p) => s + parseInt(p.rent.replace(/[₹,]/g, "")), 0);
 
   const stats = [
     { label: "Properties", value: String(properties.length), icon: Building, color: "text-primary" },
-    { label: "Total Views", value: String(properties.reduce((s, p) => s + p.views, 0)), icon: Eye, color: "text-green-600" },
-    { label: "Inquiries", value: String(properties.reduce((s, p) => s + p.inquiries, 0)), icon: MessageSquare, color: "text-orange-500" },
-    { label: "Revenue", value: `₹${Math.round(properties.filter(p => p.status === "Rented").reduce((s, p) => s + parseInt(p.rent.replace(/[₹,]/g, "")), 0) / 1000)}K`, icon: IndianRupee, color: "text-primary" },
+    { label: "Total Views", value: String(totalViews), icon: Eye, color: "text-green-600" },
+    { label: "Inquiries", value: String(totalInquiries), icon: MessageSquare, color: "text-orange-500" },
+    { label: "Monthly Revenue", value: `₹${Math.round(rentedRevenue / 1000)}K`, icon: IndianRupee, color: "text-primary" },
   ];
 
-  const handleDelete = (id: number) => {
-    setProperties((prev) => prev.filter((p) => p.id !== id));
+  const handleDelete = () => {
+    if (deleteId === null) return;
+    setProperties((prev) => prev.filter((p) => p.id !== deleteId));
+    setDeleteId(null);
     toast({ title: "Property deleted", description: "The property has been removed." });
   };
 
@@ -98,7 +130,7 @@ const OwnerDashboard = ({ user }: { user: DemoUser }) => {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold">Welcome, {user.name}</h1>
+          <h1 className="text-3xl font-bold text-foreground">Welcome, {user.name}</h1>
           <p className="text-muted-foreground">Property Owner Dashboard</p>
         </div>
         <Button onClick={handleAddProperty} className="bg-gradient-primary text-primary-foreground">
@@ -115,7 +147,7 @@ const OwnerDashboard = ({ user }: { user: DemoUser }) => {
                 <stat.icon className={`h-5 w-5 ${stat.color}`} />
               </div>
               <div>
-                <p className="text-2xl font-bold">{stat.value}</p>
+                <p className="text-2xl font-bold text-foreground">{stat.value}</p>
                 <p className="text-xs text-muted-foreground">{stat.label}</p>
               </div>
             </CardContent>
@@ -123,7 +155,96 @@ const OwnerDashboard = ({ user }: { user: DemoUser }) => {
         ))}
       </div>
 
-      {/* Properties */}
+      {/* Analytics Charts */}
+      <div className="grid md:grid-cols-2 gap-6">
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-base">
+              <BarChart3 className="h-5 w-5 text-primary" /> Views & Inquiries
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ResponsiveContainer width="100%" height={220}>
+              <BarChart data={MONTHLY_VIEWS}>
+                <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                <XAxis dataKey="month" fontSize={12} stroke="hsl(var(--muted-foreground))" />
+                <YAxis fontSize={12} stroke="hsl(var(--muted-foreground))" />
+                <Tooltip contentStyle={{ borderRadius: "8px", border: "1px solid hsl(var(--border))" }} />
+                <Bar dataKey="views" fill="hsl(221, 83%, 53%)" radius={[4, 4, 0, 0]} name="Views" />
+                <Bar dataKey="inquiries" fill="hsl(217, 91%, 75%)" radius={[4, 4, 0, 0]} name="Inquiries" />
+              </BarChart>
+            </ResponsiveContainer>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-base">
+              <TrendingUp className="h-5 w-5 text-primary" /> Revenue Trend
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ResponsiveContainer width="100%" height={220}>
+              <LineChart data={REVENUE_DATA}>
+                <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                <XAxis dataKey="month" fontSize={12} stroke="hsl(var(--muted-foreground))" />
+                <YAxis fontSize={12} stroke="hsl(var(--muted-foreground))" tickFormatter={(v) => `₹${v / 1000}K`} />
+                <Tooltip contentStyle={{ borderRadius: "8px", border: "1px solid hsl(var(--border))" }} formatter={(v: number) => [`₹${v.toLocaleString()}`, "Revenue"]} />
+                <Line type="monotone" dataKey="revenue" stroke="hsl(142, 76%, 36%)" strokeWidth={2} dot={{ fill: "hsl(142, 76%, 36%)", r: 4 }} />
+              </LineChart>
+            </ResponsiveContainer>
+          </CardContent>
+        </Card>
+      </div>
+
+      <div className="grid md:grid-cols-3 gap-6">
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-base">
+              <Calendar className="h-5 w-5 text-primary" /> Occupancy
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="flex justify-center">
+            <ResponsiveContainer width="100%" height={180}>
+              <PieChart>
+                <Pie data={OCCUPANCY_DATA} cx="50%" cy="50%" innerRadius={45} outerRadius={70} paddingAngle={4} dataKey="value" label={({ name, value }) => `${name} (${value})`}>
+                  {OCCUPANCY_DATA.map((entry, idx) => (
+                    <Cell key={idx} fill={entry.color} />
+                  ))}
+                </Pie>
+                <Tooltip />
+              </PieChart>
+            </ResponsiveContainer>
+          </CardContent>
+        </Card>
+
+        <Card className="md:col-span-2">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-base">
+              <Users className="h-5 w-5 text-primary" /> Top Performing
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-3">
+              {[...properties].sort((a, b) => b.views - a.views).slice(0, 3).map((p, i) => (
+                <div key={p.id} className="flex items-center gap-3">
+                  <span className="text-lg font-bold text-primary w-6">#{i + 1}</span>
+                  <div className="flex-1 min-w-0">
+                    <p className="font-medium truncate text-foreground">{p.title}</p>
+                    <p className="text-xs text-muted-foreground">{p.rent}/month</p>
+                  </div>
+                  <div className="text-right">
+                    <p className="font-semibold text-foreground">{p.views} views</p>
+                    <p className="text-xs text-muted-foreground">{p.inquiries} inquiries</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Properties List */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
@@ -138,7 +259,7 @@ const OwnerDashboard = ({ user }: { user: DemoUser }) => {
               {properties.map((prop) => (
                 <div key={prop.id} className="flex flex-col sm:flex-row sm:items-center justify-between p-4 bg-muted/50 rounded-lg gap-3 hover:bg-muted/80 transition-colors">
                   <div className="flex-1 min-w-0">
-                    <h4 className="font-medium truncate">{prop.title}</h4>
+                    <h4 className="font-medium truncate text-foreground">{prop.title}</h4>
                     <p className="text-sm text-muted-foreground">{prop.rent}/month</p>
                     {prop.tenant && <p className="text-xs text-primary mt-1">Tenant: {prop.tenant}</p>}
                   </div>
@@ -149,36 +270,17 @@ const OwnerDashboard = ({ user }: { user: DemoUser }) => {
                     </div>
                     <Badge variant={statusColor(prop.status)}>{prop.status}</Badge>
 
-                    {/* Mark Rented / Active */}
                     <Button size="sm" variant="outline" onClick={() => handleToggleRented(prop.id)} className="h-8 text-xs">
                       {prop.status === "Rented" ? <><XCircle className="h-3 w-3 mr-1" /> Unrent</> : <><CheckCircle className="h-3 w-3 mr-1" /> Mark Rented</>}
                     </Button>
 
-                    {/* Edit */}
                     <Button size="sm" variant="outline" className="h-8 text-xs" onClick={() => { setEditProperty({ ...prop }); setEditOpen(true); }}>
                       <Pencil className="h-3 w-3 mr-1" /> Edit
                     </Button>
 
-                    {/* Delete */}
-                    <AlertDialog>
-                      <AlertDialogTrigger asChild>
-                        <Button size="sm" variant="outline" className="h-8 text-xs text-destructive hover:text-destructive">
-                          <Trash2 className="h-3 w-3 mr-1" /> Delete
-                        </Button>
-                      </AlertDialogTrigger>
-                      <AlertDialogContent>
-                        <AlertDialogHeader>
-                          <AlertDialogTitle>Delete Property</AlertDialogTitle>
-                          <AlertDialogDescription>
-                            Are you sure you want to delete "{prop.title}"? This action cannot be undone.
-                          </AlertDialogDescription>
-                        </AlertDialogHeader>
-                        <AlertDialogFooter>
-                          <AlertDialogCancel>Cancel</AlertDialogCancel>
-                          <AlertDialogAction onClick={() => handleDelete(prop.id)} className="bg-destructive text-destructive-foreground">Delete</AlertDialogAction>
-                        </AlertDialogFooter>
-                      </AlertDialogContent>
-                    </AlertDialog>
+                    <Button size="sm" variant="outline" className="h-8 text-xs text-destructive hover:text-destructive" onClick={() => setDeleteId(prop.id)}>
+                      <Trash2 className="h-3 w-3 mr-1" /> Delete
+                    </Button>
                   </div>
                 </div>
               ))}
@@ -186,6 +288,22 @@ const OwnerDashboard = ({ user }: { user: DemoUser }) => {
           )}
         </CardContent>
       </Card>
+
+      {/* Delete Confirmation */}
+      <AlertDialog open={deleteId !== null} onOpenChange={(open) => { if (!open) setDeleteId(null); }}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Property</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete this property? This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDelete} className="bg-destructive text-destructive-foreground">Delete</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       {/* Edit Dialog */}
       <Dialog open={editOpen} onOpenChange={(open) => { setEditOpen(open); if (!open) setEditProperty(null); }}>
@@ -243,6 +361,7 @@ const OwnerDashboard = ({ user }: { user: DemoUser }) => {
               { name: "Ananya Singh", property: "Modern 2BHK in Koramangala", time: "2 hours ago" },
               { name: "Vikram Patel", property: "Studio Apartment in HSR", time: "5 hours ago" },
               { name: "Deepa Rao", property: "Modern 2BHK in Koramangala", time: "1 day ago" },
+              { name: "Rahul Mehta", property: "1BHK Flat in Indiranagar", time: "2 days ago" },
             ].map((inq, i) => (
               <div key={i} className="flex items-center justify-between p-3 border rounded-lg hover:bg-muted/30 transition-colors">
                 <div className="flex items-center gap-3">
@@ -250,7 +369,7 @@ const OwnerDashboard = ({ user }: { user: DemoUser }) => {
                     {inq.name[0]}
                   </div>
                   <div>
-                    <p className="font-medium text-sm">{inq.name}</p>
+                    <p className="font-medium text-sm text-foreground">{inq.name}</p>
                     <p className="text-xs text-muted-foreground">{inq.property}</p>
                   </div>
                 </div>

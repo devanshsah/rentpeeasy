@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from "react";
 
-export type UserRole = "owner" | "tenant";
+export type UserRole = "owner" | "tenant" | "admin";
 
 export interface DemoUser {
   id: string;
@@ -28,6 +28,14 @@ const DEMO_USERS: DemoUser[] = [
     phone: "+91 91234 56789",
     role: "tenant",
     joinedDate: "Mar 2024",
+  },
+  {
+    id: "admin-1",
+    email: "admin@renteasy.com",
+    name: "Super Admin",
+    phone: "+91 90000 00000",
+    role: "admin",
+    joinedDate: "Jan 2024",
   },
 ];
 
@@ -118,4 +126,5 @@ export const useAuth = () => {
 export const DEMO_CREDENTIALS = {
   owner: { email: "owner@renteasy.com", password: "demo123" },
   tenant: { email: "tenant@renteasy.com", password: "demo123" },
+  admin: { email: "admin@renteasy.com", password: "demo123" },
 };

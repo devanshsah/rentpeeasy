@@ -29,7 +29,7 @@ const Header = () => {
   };
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80 shadow-sm">
       <div className="container flex h-16 items-center justify-between">
         <Link to="/" className="flex items-center space-x-2">
           <div className="h-8 w-8 rounded-lg bg-gradient-primary"></div>
@@ -42,7 +42,7 @@ const Header = () => {
               key={item.path}
               to={item.path}
               className={`flex items-center space-x-1 text-sm font-medium transition-colors hover:text-primary ${
-                isActive(item.path) ? "text-primary" : "text-muted-foreground"
+                isActive(item.path) ? "text-primary font-semibold" : "text-foreground/70"
               }`}
             >
               <item.icon className="h-4 w-4" />
@@ -114,7 +114,7 @@ const Header = () => {
                 to={item.path}
                 onClick={() => setIsMenuOpen(false)}
                 className={`flex items-center space-x-2 text-sm font-medium transition-colors hover:text-primary ${
-                  isActive(item.path) ? "text-primary" : "text-muted-foreground"
+                  isActive(item.path) ? "text-primary font-semibold" : "text-foreground/70"
                 }`}
               >
                 <item.icon className="h-4 w-4" />
