@@ -87,7 +87,7 @@ const Header = () => {
             </>
           ) : (
             <>
-              <Button variant="" size="sm" onClick={() => navigate("/login")}>
+              <Button variant="ghost" size="sm" onClick={() => navigate("/login")}>
                 Login
               </Button>
               <Button
