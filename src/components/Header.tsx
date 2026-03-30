@@ -54,13 +54,14 @@ const Header = () => {
         <div className="hidden md:flex items-center space-x-4">
           {isAuthenticated && user ? (
             <>
-              <Button
-                size="sm"
-                className=""
-                onClick={() => setPostPropertyOpen(true)}
-              >
-                Post Property
-              </Button>
+              {user.role === "owner" && (
+                <Button
+                  size="sm"
+                  onClick={() => setPostPropertyOpen(true)}
+                >
+                  Post Property
+                </Button>
+              )}
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" size="sm" className="flex items-center gap-2">
