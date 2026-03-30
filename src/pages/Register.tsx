@@ -18,9 +18,9 @@ const Register = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const result = register(name, email, password, phone, role);
+    const result = await register(name, email, password, phone, role);
     if (result.success) {
       toast({ title: "Account Created!", description: `Welcome to RentEasy as a ${role === "owner" ? "Property Owner" : "Tenant"}.` });
       navigate("/dashboard");
