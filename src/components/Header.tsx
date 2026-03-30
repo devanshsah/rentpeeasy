@@ -56,7 +56,7 @@ const Header = () => {
             <>
               <Button
                 size="sm"
-                className="bg-gradient-primary text-primary-foreground shadow-soft"
+                className=""
                 onClick={() => setPostPropertyOpen(true)}
               >
                 Post Property
@@ -86,12 +86,12 @@ const Header = () => {
             </>
           ) : (
             <>
-              <Button variant="ghost" size="sm" onClick={() => navigate("/login")}>
+              <Button variant="" size="sm" onClick={() => navigate("/login")}>
                 Login
               </Button>
               <Button
                 size="sm"
-                className="bg-gradient-primary text-primary-foreground shadow-soft"
+                className=""
                 onClick={() => navigate("/register")}
               >
                 Sign Up
@@ -136,12 +136,12 @@ const Header = () => {
                 </>
               ) : (
                 <>
-                  <Button variant="ghost" size="sm" className="w-full justify-start" onClick={() => { navigate("/login"); setIsMenuOpen(false); }}>
+                  <Button variant="" size="sm" className="w-full justify-start" onClick={() => { navigate("/login"); setIsMenuOpen(false); }}>
                     Login
                   </Button>
                   <Button
                     size="sm"
-                    className="w-full bg-gradient-primary text-primary-foreground shadow-soft"
+                    className=""
                     onClick={() => { navigate("/register"); setIsMenuOpen(false); }}
                   >
                     Sign Up
