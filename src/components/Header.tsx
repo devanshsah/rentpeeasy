@@ -137,7 +137,7 @@ const Header = () => {
                 </>
               ) : (
                 <>
-                  <Button variant="" size="sm" className="w-full justify-start" onClick={() => { navigate("/login"); setIsMenuOpen(false); }}>
+                  <Button variant="ghost" size="sm" className="w-full justify-start" onClick={() => { navigate("/login"); setIsMenuOpen(false); }}>
                     Login
                   </Button>
                   <Button
