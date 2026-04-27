@@ -95,7 +95,6 @@ const Register = () => {
               </div>
 
               <Button type="submit" className="w-full bg-gradient-primary text-primary-foreground">
-                <UserPlus className="h-4 w-4 mr-2" />
                 Create Account
               </Button>
             </form>
