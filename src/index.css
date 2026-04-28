@@ -2,7 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-/* RentEasy Design System - Modern Professional Theme
+/* RentEasy Design System - Green Theme
 All colors MUST be HSL for consistency.
 */
 
@@ -17,12 +17,12 @@ All colors MUST be HSL for consistency.
     --popover: 0 0% 100%;
     --popover-foreground: 222.2 84% 4.9%;
 
-    /* Modern blue/indigo brand colors */
-    --primary: 221 83% 53%;
+    /* Green brand colors */
+    --primary: 142 76% 36%;        /* green-600 */
     --primary-foreground: 0 0% 100%;
-    --primary-light: 217 91% 60%;
-    --primary-lighter: 221 83% 70%;
-    --primary-lightest: 221 83% 95%;
+    --primary-light: 142 70% 45%;  /* green-500 */
+    --primary-lighter: 142 60% 65%;
+    --primary-lightest: 142 60% 95%;
 
     --secondary: 210 40% 96%;
     --secondary-foreground: 222.2 47.4% 11.2%;
@@ -30,7 +30,7 @@ All colors MUST be HSL for consistency.
     --muted: 210 40% 96.1%;
     --muted-foreground: 215.4 16.3% 46.9%;
 
-    --accent: 217 91% 60%;
+    --accent: 142 70% 45%;
     --accent-foreground: 0 0% 100%;
 
     --destructive: 0 84.2% 60.2%;
@@ -38,24 +38,24 @@ All colors MUST be HSL for consistency.
 
     --border: 214.3 31.8% 91.4%;
     --input: 214.3 31.8% 91.4%;
-    --ring: 221 83% 53%;
+    --ring: 142 76% 36%;
 
     --radius: 0.75rem;
 
-    --chart-1: 221 83% 53%;
-    --chart-2: 217 91% 60%;
+    --chart-1: 142 76% 36%;
+    --chart-2: 142 70% 45%;
     --chart-3: 262 83% 58%;
     --chart-4: 199 89% 48%;
-    --chart-5: 142 76% 36%;
+    --chart-5: 142 60% 50%;
 
     --sidebar-background: 0 0% 98%;
     --sidebar-foreground: 240 5.3% 26.1%;
-    --sidebar-primary: 240 5.9% 10%;
+    --sidebar-primary: 142 76% 30%;
     --sidebar-primary-foreground: 0 0% 98%;
-    --sidebar-accent: 240 4.8% 95.9%;
-    --sidebar-accent-foreground: 240 5.9% 10%;
+    --sidebar-accent: 142 60% 95%;
+    --sidebar-accent-foreground: 142 76% 20%;
     --sidebar-border: 220 13% 91%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --sidebar-ring: 142 70% 45%;
   }
 
   .dark {
@@ -68,11 +68,12 @@ All colors MUST be HSL for consistency.
     --popover: 222.2 84% 4.9%;
     --popover-foreground: 210 40% 98%;
 
-    --primary: 217 91% 60%;
+    /* Green dark theme */
+    --primary: 142 70% 45%;
     --primary-foreground: 222.2 47.4% 11.2%;
-    --primary-light: 221 83% 70%;
-    --primary-lighter: 217 91% 75%;
-    --primary-lightest: 221 50% 15%;
+    --primary-light: 142 60% 55%;
+    --primary-lighter: 142 55% 65%;
+    --primary-lightest: 142 30% 15%;
 
     --secondary: 217.2 32.6% 17.5%;
     --secondary-foreground: 210 40% 98%;
@@ -80,7 +81,7 @@ All colors MUST be HSL for consistency.
     --muted: 217.2 32.6% 17.5%;
     --muted-foreground: 215 20.2% 65.1%;
 
-    --accent: 221 83% 53%;
+    --accent: 142 76% 36%;
     --accent-foreground: 210 40% 98%;
 
     --destructive: 0 62.8% 30.6%;
@@ -88,22 +89,22 @@ All colors MUST be HSL for consistency.
 
     --border: 217.2 32.6% 17.5%;
     --input: 217.2 32.6% 17.5%;
-    --ring: 217 91% 60%;
+    --ring: 142 70% 45%;
 
-    --chart-1: 217 91% 60%;
-    --chart-2: 221 83% 53%;
+    --chart-1: 142 70% 45%;
+    --chart-2: 142 76% 36%;
     --chart-3: 262 83% 58%;
     --chart-4: 199 89% 48%;
-    --chart-5: 142 76% 36%;
+    --chart-5: 142 60% 50%;
 
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
+    --sidebar-background: 142 20% 10%;
+    --sidebar-foreground: 142 20% 90%;
+    --sidebar-primary: 142 70% 45%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --sidebar-accent: 142 20% 15%;
+    --sidebar-accent-foreground: 142 20% 90%;
+    --sidebar-border: 142 20% 15%;
+    --sidebar-ring: 142 70% 45%;
   }
 }
 
@@ -117,22 +118,30 @@ All colors MUST be HSL for consistency.
   }
 
   .bg-gradient-hero {
-    background: linear-gradient(135deg, hsl(221, 83%, 98%) 0%, hsl(217, 91%, 98%) 100%);
+    background: linear-gradient(
+            135deg,
+            hsl(142, 60%, 98%) 0%,
+            hsl(142, 50%, 96%) 100%
+    );
   }
 
   .bg-gradient-primary {
-    background: linear-gradient(135deg, hsl(221, 83%, 53%) 0%, hsl(217, 91%, 60%) 100%);
+    background: linear-gradient(
+            135deg,
+            hsl(142, 76%, 36%) 0%,
+            hsl(142, 70%, 45%) 100%
+    );
   }
 
   .shadow-soft {
-    box-shadow: 0 2px 8px -2px hsl(221, 83%, 53%, 0.1);
+    box-shadow: 0 2px 8px -2px hsl(142, 76%, 36%, 0.1);
   }
 
   .shadow-large {
-    box-shadow: 0 10px 40px -10px hsl(221, 83%, 53%, 0.15);
+    box-shadow: 0 10px 40px -10px hsl(142, 76%, 36%, 0.15);
   }
 
   .shadow-glow {
-    box-shadow: 0 0 20px hsl(221, 83%, 53%, 0.2);
+    box-shadow: 0 0 20px hsl(142, 76%, 36%, 0.2);
   }
 }

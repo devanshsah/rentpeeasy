@@ -34,7 +34,7 @@ const Footer = () => {
           <div>
             <div className="flex items-center space-x-2 mb-4">
               <div className="h-8 w-8 rounded-lg bg-gradient-primary"></div>
-              <span className="text-2xl font-bold text-primary">RentEasy</span>
+              <span className="text-2xl font-bold text-primary">RentPeRazi</span>
             </div>
             <p className="text-sm text-muted-foreground mb-6">
               Find your perfect rental home with India's most trusted property platform.
@@ -111,7 +111,7 @@ const Footer = () => {
               </div>
               <div className="flex items-center gap-2">
                 <Mail className="h-4 w-4" />
-                <span>info@renteasy.com</span>
+                <span>info@RentPeRazi.com</span>
               </div>
             </div>
           </div>

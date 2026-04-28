@@ -110,7 +110,7 @@ const About = () => {
       <section className="bg-gradient-hero py-20">
         <div className="container text-center">
           <Badge className="mb-6 bg-primary-lightest text-primary border-primary/20">
-            About RentEasy
+            About RentPeRazi
           </Badge>
           <h1 className="text-4xl md:text-5xl font-bold mb-6">
             Transforming Property Rentals
@@ -244,7 +244,7 @@ const About = () => {
               Meet Our <span className="text-primary">Team</span>
             </h2>
             <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-              The passionate individuals behind RentEasy's success
+              The passionate individuals behind RentPeRazi's success
             </p>
           </div>
 
