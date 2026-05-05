@@ -1,25 +1,61 @@
-// Base URL - reads VITE_BACKEND_URL from .env, falls back to localhost
+// Base URL
 const API_BASE = import.meta.env.VITE_BACKEND_URL
     ? `${import.meta.env.VITE_BACKEND_URL}/api`
     : "http://localhost:8001/api";
 
-// ── helpers ───────────────────────────────────────────────────────────────────
+// ── session storage ───────────────────────────────────────────────────────────
 
-function getStoredUser(): StoredSession | null {
+export interface StoredSession {
+  accessToken: string;
+  refreshToken: string;
+  user: UserDto;
+  avatarUrl?: string; // stored locally until backend supports it
+}
+
+export function getStoredSession(): StoredSession | null {
   try {
     const raw = localStorage.getItem("renteasy_session");
     return raw ? JSON.parse(raw) : null;
-  } catch {
-    return null;
+  } catch { return null; }
+}
+
+export function saveSession(res: AuthResponse, avatarUrl?: string) {
+  const existing = getStoredSession();
+  const session: StoredSession = {
+    accessToken: res.accessToken,
+    refreshToken: res.refreshToken,
+    user: res.user,
+    avatarUrl: avatarUrl ?? existing?.avatarUrl,
+  };
+  localStorage.setItem("renteasy_session", JSON.stringify(session));
+}
+
+export function updateSessionAvatar(avatarUrl: string) {
+  const session = getStoredSession();
+  if (session) {
+    session.avatarUrl = avatarUrl;
+    localStorage.setItem("renteasy_session", JSON.stringify(session));
   }
 }
 
+export function clearSession() {
+  localStorage.removeItem("renteasy_session");
+}
+
+export function loadSession(): StoredSession | null {
+  return getStoredSession();
+}
+
+// ── auth headers ──────────────────────────────────────────────────────────────
+
 function authHeaders(): Record<string, string> {
-  const session = getStoredUser();
+  const session = getStoredSession();
   return session?.accessToken
       ? { Authorization: `Bearer ${session.accessToken}` }
       : {};
 }
+
+// ── generic request ───────────────────────────────────────────────────────────
 
 async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
   const res = await fetch(`${API_BASE}${path}`, {
@@ -30,20 +66,14 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
       ...(options.headers as Record<string, string> | undefined),
     },
   });
-
-  // 204 No Content
   if (res.status === 204) return undefined as T;
-
   const data = await res.json();
-  if (!res.ok) {
-    throw new Error(data.message || data.error || `Request failed (${res.status})`);
-  }
+  if (!res.ok) throw new Error(data.message || data.error || `Request failed (${res.status})`);
   return data as T;
 }
 
-// ── types matching backend DTOs exactly ───────────────────────────────────────
+// ── types ─────────────────────────────────────────────────────────────────────
 
-/** Matches AuthResponse.java */
 export interface AuthResponse {
   accessToken: string;
   refreshToken: string;
@@ -51,26 +81,24 @@ export interface AuthResponse {
   user: UserDto;
 }
 
-/** Matches UserDto.java */
 export interface UserDto {
-  id: string;           // UUID
+  id: string;
   username: string;
   email: string;
   fullName: string;
   phoneNumber: string;
-  role: "USER" | "OWNER" | "ADMIN";
+  role: "USER" | "OWNER" | "ADMIN" | "TENANT";
   createdAt: string;
 }
 
-/** Matches PropertyDto.java */
 export interface PropertyDto {
-  id: string;           // UUID
+  id: string;
   title: string;
   description: string;
   type: PropertyType;
   city: string;
   locality: string;
-  price: number;        // BigDecimal comes as number in JSON
+  price: number;
   priceUnit: string;
   beds: number | null;
   baths: number | null;
@@ -87,7 +115,6 @@ export interface PropertyDto {
   updatedAt: string;
 }
 
-/** Matches PropertyRequest.java */
 export interface PropertyRequest {
   title: string;
   description?: string;
@@ -107,22 +134,6 @@ export interface PropertyRequest {
   status?: string;
 }
 
-/** Matches LoginRequest.java - only username, no email */
-export interface LoginRequest {
-  username: string;
-  password: string;
-}
-
-/** Matches RegisterRequest.java */
-export interface RegisterRequest {
-  username: string;
-  email: string;
-  password: string;
-  fullName?: string;
-}
-
-export type PropertyType = "PG" | "ROOM" | "APARTMENT" | "FLAT" | "VILLA" | "COMMERCIAL";
-
 export interface PropertyFilters {
   city?: string;
   type?: PropertyType;
@@ -130,54 +141,60 @@ export interface PropertyFilters {
   maxPrice?: number;
 }
 
-// ── stored session (what we persist in localStorage) ─────────────────────────
+export type PropertyType = "PG" | "ROOM" | "APARTMENT" | "FLAT" | "VILLA" | "COMMERCIAL";
+export type UserRole = "USER" | "OWNER" | "ADMIN" | "TENANT";
 
-export interface StoredSession {
-  accessToken: string;
-  refreshToken: string;
-  user: UserDto;
-}
+// ── Cloudinary image upload ───────────────────────────────────────────────────
+// 1. Sign up free at cloudinary.com
+// 2. Copy Cloud Name from dashboard
+// 3. Settings > Upload > Upload presets > Add preset > set Unsigned
+// 4. Add to .env: VITE_CLOUDINARY_CLOUD_NAME=xxx  VITE_CLOUDINARY_UPLOAD_PRESET=xxx
 
-export function saveSession(res: AuthResponse) {
-  const session: StoredSession = {
-    accessToken: res.accessToken,
-    refreshToken: res.refreshToken,
-    user: res.user,
-  };
-  localStorage.setItem("renteasy_session", JSON.stringify(session));
-}
+const CLOUDINARY_CLOUD = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME ?? "";
+const CLOUDINARY_PRESET = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET ?? "rentpeeasy_unsigned";
 
-export function clearSession() {
-  localStorage.removeItem("renteasy_session");
-}
+export async function uploadImageToCloudinary(file: File): Promise<string> {
+  if (!CLOUDINARY_CLOUD) {
+    throw new Error("Cloudinary not configured. Add VITE_CLOUDINARY_CLOUD_NAME to your .env file.");
+  }
+  const formData = new FormData();
+  formData.append("file", file);
+  formData.append("upload_preset", CLOUDINARY_PRESET);
+  formData.append("folder", "rentpeeasy");
 
-export function loadSession(): StoredSession | null {
-  return getStoredUser();
+  const res = await fetch(
+      `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD}/image/upload`,
+      { method: "POST", body: formData }
+  );
+  const data = await res.json();
+  if (!res.ok || !data.secure_url) throw new Error(data.error?.message ?? "Image upload failed");
+  return data.secure_url as string;
 }
 
 // ── API methods ───────────────────────────────────────────────────────────────
 
 export const api = {
-
-  // ── auth ──────────────────────────────────────────────────────────────────
-
-  /** POST /api/auth/login  — backend expects { username, password } */
   async login(username: string, password: string): Promise<AuthResponse> {
     return request<AuthResponse>("/auth/login", {
       method: "POST",
-      body: JSON.stringify({ username, password } satisfies LoginRequest),
+      body: JSON.stringify({ username, password }),
     });
   },
 
-  /** POST /api/auth/register  — backend expects { username, email, password, fullName } */
-  async register(data: RegisterRequest): Promise<AuthResponse> {
+  async register(data: {
+    username: string;
+    email: string;
+    password: string;
+    fullName?: string;
+    phoneNumber: string;
+    role: "USER" | "TENANT" | "OWNER";
+  }): Promise<AuthResponse> {
     return request<AuthResponse>("/auth/register", {
       method: "POST",
       body: JSON.stringify(data),
     });
   },
 
-  /** POST /api/auth/refresh */
   async refreshToken(refreshToken: string): Promise<AuthResponse> {
     return request<AuthResponse>("/auth/refresh", {
       method: "POST",
@@ -185,16 +202,10 @@ export const api = {
     });
   },
 
-  /** POST /api/auth/logout */
   async logout(): Promise<void> {
-    try {
-      await request<void>("/auth/logout", { method: "POST" });
-    } catch { /* always clear locally */ }
+    try { await request<void>("/auth/logout", { method: "POST" }); } catch { }
   },
 
-  // ── properties ─────────────────────────────────────────────────────────────
-
-  /** GET /api/properties?city=&type=&minPrice=&maxPrice= */
   async getProperties(filters?: PropertyFilters): Promise<PropertyDto[]> {
     const params = new URLSearchParams();
     if (filters?.city) params.set("city", filters.city);
@@ -205,71 +216,51 @@ export const api = {
     return request<PropertyDto[]>(`/properties${qs ? `?${qs}` : ""}`);
   },
 
-  /** GET /api/properties/featured */
   async getFeaturedProperties(): Promise<PropertyDto[]> {
     return request<PropertyDto[]>("/properties/featured");
   },
 
-  /** GET /api/properties/:id */
   async getProperty(id: string): Promise<PropertyDto> {
     return request<PropertyDto>(`/properties/${id}`);
   },
 
-  /** POST /api/properties (auth required) */
   async createProperty(data: PropertyRequest): Promise<PropertyDto> {
-    return request<PropertyDto>("/properties", {
-      method: "POST",
-      body: JSON.stringify(data),
-    });
+    return request<PropertyDto>("/properties", { method: "POST", body: JSON.stringify(data) });
   },
 
-  /** PUT /api/properties/:id (owner only) */
   async updateProperty(id: string, data: PropertyRequest): Promise<PropertyDto> {
-    return request<PropertyDto>(`/properties/${id}`, {
-      method: "PUT",
-      body: JSON.stringify(data),
-    });
+    return request<PropertyDto>(`/properties/${id}`, { method: "PUT", body: JSON.stringify(data) });
   },
 
-  /** DELETE /api/properties/:id (owner only) */
   async deleteProperty(id: string): Promise<void> {
     return request<void>(`/properties/${id}`, { method: "DELETE" });
   },
 
-  // ── favorites ──────────────────────────────────────────────────────────────
-
-  /** GET /api/favorites (auth required) */
   async getFavorites(): Promise<PropertyDto[]> {
     return request<PropertyDto[]>("/favorites");
   },
 
-  /** POST /api/favorites/:propertyId (auth required) */
   async addFavorite(propertyId: string): Promise<void> {
     return request<void>(`/favorites/${propertyId}`, { method: "POST" });
   },
 
-  /** DELETE /api/favorites/:propertyId (auth required) */
   async removeFavorite(propertyId: string): Promise<void> {
     return request<void>(`/favorites/${propertyId}`, { method: "DELETE" });
   },
 };
-
-// ── silent token refresh on app start ────────────────────────────────────────
 
 export async function tryRefreshSession(): Promise<boolean> {
   const session = loadSession();
   if (!session?.refreshToken) return false;
   try {
     const fresh = await api.refreshToken(session.refreshToken);
-    saveSession(fresh);
+    saveSession(fresh, session.avatarUrl);
     return true;
   } catch {
     clearSession();
     return false;
   }
 }
-
-// ── display helpers ────────────────────────────────────────────────────────────
 
 export function formatPrice(price: number | null | undefined): string {
   if (price == null) return "Price on request";

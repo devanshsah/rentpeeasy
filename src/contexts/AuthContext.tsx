@@ -1,53 +1,35 @@
+import { createContext, useContext, useState, useEffect, ReactNode } from "react";
 import {
-  createContext,
-  useContext,
-  useState,
-  useEffect,
-  ReactNode,
-} from "react";
-import {
-  api,
-  loadSession,
-  saveSession,
-  clearSession,
-  tryRefreshSession,
-  type UserDto,
-  type StoredSession,
+  api, loadSession, saveSession, clearSession, tryRefreshSession,
+  updateSessionAvatar, type UserDto, type StoredSession,
 } from "@/lib/api";
 
-// ── types ─────────────────────────────────────────────────────────────────────
+export type UserRole = "USER" | "OWNER" | "ADMIN" | "TENANT";
 
-/** Role strings as they come from backend (uppercase) */
-export type UserRole = "USER" | "OWNER" | "ADMIN";
-
-/** The shape components use — comes directly from UserDto */
 export type AppUser = UserDto & {
   token: string;
+  avatarUrl?: string;
 };
 
 interface AuthContextType {
   user: AppUser | null;
-  login: (
-      username: string,
-      password: string
-  ) => Promise<{ success: boolean; error?: string }>;
-  register: (
-      username: string,
-      email: string,
-      password: string,
-      fullName: string
-  ) => Promise<{ success: boolean; error?: string }>;
+  login: (username: string, password: string) => Promise<{ success: boolean; error?: string }>;
+  register: (data: {
+    username: string;
+    email: string;
+    password: string;
+    fullName?: string;
+    phoneNumber: string;
+    role: "USER" | "TENANT" | "OWNER";
+  }) => Promise<{ success: boolean; error?: string }>;
   logout: () => Promise<void>;
+  updateAvatar: (url: string) => void;
   isAuthenticated: boolean;
 }
 
-// ── helpers ───────────────────────────────────────────────────────────────────
-
 function sessionToUser(session: StoredSession): AppUser {
-  return { ...session.user, token: session.accessToken };
+  return { ...session.user, token: session.accessToken, avatarUrl: session.avatarUrl };
 }
-
-// ── context ───────────────────────────────────────────────────────────────────
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -57,7 +39,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     return session ? sessionToUser(session) : null;
   });
 
-  // On mount: silently try to refresh so session survives page reload
   useEffect(() => {
     tryRefreshSession().then((ok) => {
       if (ok) {
@@ -67,55 +48,42 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     });
   }, []);
 
-  // ── login ──────────────────────────────────────────────────────────────────
-  const login = async (
-      username: string,
-      password: string
-  ): Promise<{ success: boolean; error?: string }> => {
+  const login = async (username: string, password: string) => {
     try {
       const res = await api.login(username, password);
-      saveSession(res);
-      setUser(sessionToUser({ accessToken: res.accessToken, refreshToken: res.refreshToken, user: res.user }));
+      const existing = loadSession();
+      saveSession(res, existing?.avatarUrl);
+      setUser(sessionToUser({ accessToken: res.accessToken, refreshToken: res.refreshToken, user: res.user, avatarUrl: existing?.avatarUrl }));
       return { success: true };
     } catch (err) {
-      return {
-        success: false,
-        error: err instanceof Error ? err.message : "Login failed. Please try again.",
-      };
+      return { success: false, error: err instanceof Error ? err.message : "Login failed." };
     }
   };
 
-  // ── register ───────────────────────────────────────────────────────────────
-  const register = async (
-      username: string,
-      email: string,
-      password: string,
-      fullName: string
-  ): Promise<{ success: boolean; error?: string }> => {
+  const register = async (data: Parameters<typeof api.register>[0]) => {
     try {
-      const res = await api.register({ username, email, password, fullName });
+      const res = await api.register(data);
       saveSession(res);
       setUser(sessionToUser({ accessToken: res.accessToken, refreshToken: res.refreshToken, user: res.user }));
       return { success: true };
     } catch (err) {
-      return {
-        success: false,
-        error: err instanceof Error ? err.message : "Registration failed. Please try again.",
-      };
+      return { success: false, error: err instanceof Error ? err.message : "Registration failed." };
     }
   };
 
-  // ── logout ─────────────────────────────────────────────────────────────────
   const logout = async () => {
     await api.logout();
     clearSession();
     setUser(null);
   };
 
+  const updateAvatar = (url: string) => {
+    updateSessionAvatar(url);
+    setUser((prev) => prev ? { ...prev, avatarUrl: url } : prev);
+  };
+
   return (
-      <AuthContext.Provider
-          value={{ user, login, register, logout, isAuthenticated: !!user }}
-      >
+      <AuthContext.Provider value={{ user, login, register, logout, updateAvatar, isAuthenticated: !!user }}>
         {children}
       </AuthContext.Provider>
   );
