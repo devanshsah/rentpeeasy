@@ -129,7 +129,7 @@ const AdminDashboard = ({ user }: { user: DemoUser }) => {
     <div className="space-y-8">
       <div>
         <h1 className="text-3xl font-bold text-foreground">Admin Dashboard</h1>
-        <p className="text-muted-foreground">Platform overview & moderation · Welcome, {user.name}</p>
+        <p className="text-muted-foreground">Platform overview & moderation · Welcome, {user.fullName || user.username}</p>
       </div>
 
       {/* Platform Stats */}
