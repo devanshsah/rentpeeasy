@@ -109,7 +109,7 @@ const PropertyDetail = () => {
 
               <div>
                 <div className="flex flex-wrap gap-2 mb-3">
-                  {property.verified && <Badge className="bg-green-100 text-green-700 border-green-200"><CheckCircle2 className="h-3 w-3 mr-1" />Verified</Badge>}
+                  {property.isVerified && <Badge className="bg-green-100 text-green-700 border-green-200"><CheckCircle2 className="h-3 w-3 mr-1" />Verified</Badge>}
                   <Badge variant="secondary">{property.type}</Badge>
                 </div>
                 <h1 className="text-2xl md:text-3xl font-bold mb-2">{property.title}</h1>
