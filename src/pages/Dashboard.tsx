@@ -13,8 +13,8 @@ const Dashboard = () => {
 
   const renderDashboard = () => {
     switch (user.role) {
-      case "admin": return <AdminDashboard user={user} />;
-      case "owner": return <OwnerDashboard user={user} />;
+      case "ADMIN": return <AdminDashboard user={user} />;
+      case "OWNER": return <OwnerDashboard user={user} />;
       default: return <TenantDashboard user={user} />;
     }
   };
