@@ -105,12 +105,17 @@ const Header = () => {
                 </>
             ) : (
                 <>
-                  <Button variant="ghost" size="sm" onClick={() => navigate("/login")}>
+                  <Button
+                      variant="outline"
+                      size="sm"
+                      className="border-primary text-primary hover:bg-primary hover:text-primary-foreground"
+                      onClick={() => navigate("/login")}
+                  >
                     Login
                   </Button>
                   <Button
                       size="sm"
-                      className="bg-gradient-primary text-primary-foreground"
+                      className="bg-primary text-primary-foreground hover:bg-primary/90"
                       onClick={() => navigate("/register")}
                   >
                     Sign Up
