@@ -381,7 +381,7 @@ const OwnerDashboard = ({ user }: { user: AppUser }) => {
                   <Label>Type *</Label>
                   <Select
                       value={form.type}
-                      onValueChange={(v) => setForm({ ...form, type: v })}
+                      onValueChange={(v) => setForm({ ...form, type: v as NewPropertyForm["type"] })}
                   >
                     <SelectTrigger>
                       <SelectValue />
