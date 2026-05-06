@@ -1,8 +1,7 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardFooter } from "@/components/ui/card";
-import { MapPin, Bed, Bath, Square, Heart, Phone, MessageCircle } from "lucide-react";
+import { MapPin, Bed, Bath, Square, Heart, CheckCircle, Phone, MessageCircle, ChevronLeft, ChevronRight } from "lucide-react";
 
 interface PropertyCardProps {
   id: string;
@@ -13,100 +12,151 @@ interface PropertyCardProps {
   beds?: number;
   baths?: number;
   area?: number;
-  image: string;
-  verified: boolean;
+  images?: string[];
+  image?: string;
+  verified?: boolean;
   featured?: boolean;
+  contactNumber?: string;
+  ownerName?: string;
+  amenities?: string[];
+  postedAt?: string;
 }
 
 const PropertyCard = ({
-  id,
-  title,
-  location,
-  price,
-  type,
-  beds,
-  baths,
-  area,
-  image,
-  verified,
-  featured,
-}: PropertyCardProps) => {
+                        id, title, location, price, type, beds, baths, area,
+                        images, image, verified, featured, contactNumber, ownerName, amenities = [], postedAt,
+                      }: PropertyCardProps) => {
+  const allImages = images?.length ? images : image ? [image] : ["https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=600"];
+  const [imgIndex, setImgIndex] = useState(0);
+  const [isFav, setIsFav] = useState(false);
+
+  const prevImg = (e: React.MouseEvent) => { e.preventDefault(); setImgIndex((i) => (i - 1 + allImages.length) % allImages.length); };
+  const nextImg = (e: React.MouseEvent) => { e.preventDefault(); setImgIndex((i) => (i + 1) % allImages.length); };
+
+  const whatsappNumber = contactNumber?.replace(/\D/g, "");
+  const visibleAmenities = amenities.slice(0, 3);
+  const extraAmenities = amenities.length - 3;
+
   return (
-    <Link to={`/property/${id}`}>
-      <Card className="group overflow-hidden transition-all hover:shadow-medium cursor-pointer">
-      <div className="relative">
-        <img
-          src={image}
-          alt={title}
-          className="w-full h-48 object-cover transition-transform group-hover:scale-105"
-        />
-        <div className="absolute top-3 left-3 flex gap-2">
-          {featured && (
-            <Badge className="bg-primary text-primary-foreground">Featured</Badge>
-          )}
-          {verified && (
-            <Badge variant="secondary" className="bg-green-100 text-green-800">
-              Verified
-            </Badge>
-          )}
+      <div className="bg-card border border-border rounded-xl overflow-hidden hover:shadow-medium transition-all duration-200 group">
+        <div className="flex flex-col sm:flex-row">
+
+          {/* Image */}
+          <Link to={`/property/${id}`} className="relative sm:w-60 flex-shrink-0">
+            <div className="relative h-52 sm:h-full min-h-[200px] overflow-hidden bg-muted">
+              <img src={allImages[imgIndex]} alt={title} className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" />
+
+              <div className="absolute top-3 left-3 flex flex-col gap-1.5">
+                {verified && (
+                    <span className="inline-flex items-center gap-1 bg-green-500 text-white text-xs font-semibold px-2 py-0.5 rounded-full shadow-sm">
+                  <CheckCircle className="h-3 w-3" /> Verified
+                </span>
+                )}
+                {featured && (
+                    <span className="bg-primary text-primary-foreground text-xs font-semibold px-2 py-0.5 rounded-full shadow-sm">Featured</span>
+                )}
+              </div>
+
+              <span className="absolute top-3 right-9 bg-black/60 text-white text-xs px-2 py-0.5 rounded-full backdrop-blur-sm">{type}</span>
+
+              <button onClick={(e) => { e.preventDefault(); setIsFav(!isFav); }}
+                      className="absolute top-2.5 right-2.5 w-7 h-7 rounded-full bg-white/90 flex items-center justify-center shadow hover:bg-white transition-colors">
+                <Heart className={`h-3.5 w-3.5 transition-colors ${isFav ? "fill-red-500 text-red-500" : "text-gray-500"}`} />
+              </button>
+
+              {allImages.length > 1 && (
+                  <>
+                    <button onClick={prevImg} className="absolute left-1.5 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full bg-black/50 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity hover:bg-black/70">
+                      <ChevronLeft className="h-4 w-4" />
+                    </button>
+                    <button onClick={nextImg} className="absolute right-1.5 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full bg-black/50 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity hover:bg-black/70">
+                      <ChevronRight className="h-4 w-4" />
+                    </button>
+                    <span className="absolute bottom-2 right-2 bg-black/60 text-white text-xs px-1.5 py-0.5 rounded-full">{imgIndex + 1}/{allImages.length}</span>
+                  </>
+              )}
+            </div>
+          </Link>
+
+          {/* Details */}
+          <div className="flex-1 p-4 flex flex-col justify-between min-w-0">
+            <div className="space-y-2">
+              <Link to={`/property/${id}`}>
+                <h3 className="font-semibold text-base leading-snug hover:text-primary transition-colors line-clamp-2">{title}</h3>
+              </Link>
+
+              <div className="flex items-baseline gap-1.5">
+                <span className="text-xl font-bold text-primary">{price}</span>
+                <span className="text-xs text-muted-foreground">per month</span>
+              </div>
+
+              <p className="flex items-center gap-1 text-sm text-muted-foreground">
+                <MapPin className="h-3.5 w-3.5 flex-shrink-0 text-primary/70" />
+                <span className="truncate">{location}</span>
+              </p>
+
+              {(beds != null || baths != null || area != null) && (
+                  <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                    {beds != null && <span className="flex items-center gap-1"><Bed className="h-3.5 w-3.5" /> {beds} {beds === 1 ? "Bed" : "Beds"}</span>}
+                    {baths != null && <span className="flex items-center gap-1"><Bath className="h-3.5 w-3.5" /> {baths} {baths === 1 ? "Bath" : "Baths"}</span>}
+                    {area != null && <span className="flex items-center gap-1"><Square className="h-3.5 w-3.5" /> {area.toLocaleString("en-IN")} sq.ft</span>}
+                  </div>
+              )}
+
+              {amenities.length > 0 && (
+                  <div className="flex flex-wrap gap-1.5 pt-0.5">
+                    {visibleAmenities.map((a) => (
+                        <span key={a} className="bg-muted text-muted-foreground text-xs px-2 py-0.5 rounded-full border border-border">{a}</span>
+                    ))}
+                    {extraAmenities > 0 && (
+                        <span className="bg-primary-lightest text-primary text-xs px-2 py-0.5 rounded-full border border-primary/20 font-medium">+{extraAmenities} more</span>
+                    )}
+                  </div>
+              )}
+            </div>
+
+            {/* Bottom row */}
+            <div className="flex items-center justify-between mt-3 pt-3 border-t border-border gap-3 flex-wrap">
+              <div className="text-xs text-muted-foreground">
+                {ownerName
+                    ? <span>Posted by <span className="font-medium text-foreground">{ownerName}</span></span>
+                    : postedAt ? <span>Updated {postedAt}</span> : <span className="text-primary">Available Now</span>
+                }
+              </div>
+
+              <div className="flex gap-2 flex-shrink-0">
+                {contactNumber ? (
+                    <a href={`tel:${contactNumber}`} onClick={(e) => e.stopPropagation()}>
+                      <Button variant="outline" size="sm" className="text-xs h-8 px-3 border-primary text-primary hover:bg-primary/5">
+                        <Phone className="h-3.5 w-3.5 mr-1" /> Contact Owner
+                      </Button>
+                    </a>
+                ) : (
+                    <Link to={`/property/${id}`}>
+                      <Button variant="outline" size="sm" className="text-xs h-8 px-3 border-primary text-primary hover:bg-primary/5">
+                        <Phone className="h-3.5 w-3.5 mr-1" /> Contact Owner
+                      </Button>
+                    </Link>
+                )}
+
+                {whatsappNumber ? (
+                    <a href={`https://wa.me/${whatsappNumber}`} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()}>
+                      <Button size="sm" className="text-xs h-8 px-3 bg-green-500 hover:bg-green-600 text-white border-0">
+                        <MessageCircle className="h-3.5 w-3.5 mr-1" /> WhatsApp
+                      </Button>
+                    </a>
+                ) : (
+                    <Link to={`/property/${id}`}>
+                      <Button size="sm" className="text-xs h-8 px-3 bg-green-500 hover:bg-green-600 text-white border-0">
+                        <MessageCircle className="h-3.5 w-3.5 mr-1" /> WhatsApp
+                      </Button>
+                    </Link>
+                )}
+              </div>
+            </div>
+          </div>
         </div>
-        <button className="absolute top-3 right-3 p-2 rounded-full bg-white/90 shadow-soft hover:bg-white transition-colors">
-          <Heart className="h-4 w-4" />
-        </button>
       </div>
-
-      <CardContent className="p-4">
-        <div className="space-y-3">
-          <div>
-            <h3 className="font-semibold text-lg line-clamp-1">{title}</h3>
-            <div className="flex items-center text-muted-foreground text-sm mt-1">
-              <MapPin className="h-3 w-3 mr-1" />
-              {location}
-            </div>
-          </div>
-
-          <div className="flex items-center justify-between">
-            <div className="text-2xl font-bold text-primary">{price}</div>
-            <Badge variant="outline">{type}</Badge>
-          </div>
-
-          {(beds || baths || area) && (
-            <div className="flex items-center gap-4 text-sm text-muted-foreground">
-              {beds && (
-                <div className="flex items-center gap-1">
-                  <Bed className="h-4 w-4" />
-                  {beds} Beds
-                </div>
-              )}
-              {baths && (
-                <div className="flex items-center gap-1">
-                  <Bath className="h-4 w-4" />
-                  {baths} Baths
-                </div>
-              )}
-              {area && (
-                <div className="flex items-center gap-1">
-                  <Square className="h-4 w-4" />
-                  {area} sqft
-                </div>
-              )}
-            </div>
-          )}
-        </div>
-      </CardContent>
-
-      <CardFooter className="p-4 pt-0 flex gap-2">
-        <Button variant="outline" size="sm" className="flex-1">
-          <Phone className="h-4 w-4 mr-2" />
-          Call
-        </Button>
-        <Button size="sm" className="flex-1 bg-gradient-primary text-primary-foreground shadow-soft">
-          <MessageCircle className="h-4 w-4 mr-2" />
-          Contact
-        </Button>
-      </CardFooter>
-    </Card>
-    </Link>
   );
 };
 
