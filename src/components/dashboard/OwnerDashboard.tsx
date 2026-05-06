@@ -29,7 +29,7 @@ import { api, type Property } from "@/lib/api";
 
 type NewPropertyForm = {
   title: string;
-  type: string;
+  type: import("@/lib/api").PropertyType;
   city: string;
   locality: string;
   price: string;
