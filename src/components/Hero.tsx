@@ -48,23 +48,22 @@ const Hero = () => {
   ];
 
   return (
-    <section className="relative min-h-[600px] flex items-center justify-center overflow-hidden">
-      {/* Background */}
+    <section className="relative min-h-[600px] flex items-center justify-center overflow-hidden bg-gradient-to-b from-primary-lightest via-background to-background">
+      {/* Subtle background image */}
       <div
-        className="absolute inset-0 z-0"
+        className="absolute inset-0 z-0 opacity-20"
         style={{
           backgroundImage: `url(${heroImage})`,
           backgroundSize: "cover",
           backgroundPosition: "center",
         }}
-      >
-        <div className="absolute inset-0 bg-gradient-hero opacity-90" />
-      </div>
+      />
+      <div className="absolute inset-0 z-0 bg-gradient-to-b from-background/40 via-background/70 to-background" />
 
       {/* Content */}
       <div className="relative z-10 container mx-auto px-4">
         <div className="max-w-4xl mx-auto space-y-8 animate-fade-in text-center">
-          <h1 className="text-3xl md:text-5xl font-bold text-foreground leading-tight">
+          <h1 className="text-3xl md:text-5xl font-bold text-foreground leading-tight drop-shadow-sm">
             World's Largest{" "}
             <span className="text-primary">NoBrokerage</span> Property Site
           </h1>
