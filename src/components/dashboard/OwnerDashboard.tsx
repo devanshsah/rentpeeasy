@@ -173,7 +173,7 @@ const OwnerDashboard = ({ user }: { user: AppUser }) => {
 
   const handleDelete = async (id: string | number) => {
     try {
-      await api.deleteProperty(id);
+      await api.deleteProperty(String(id));
       setProperties((prev) => prev.filter((p) => p.id !== id));
       toast({ title: "Property deleted" });
     } catch {
