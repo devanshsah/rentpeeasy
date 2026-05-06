@@ -105,12 +105,17 @@ const Header = () => {
                 </>
             ) : (
                 <>
-                  <Button variant="ghost" size="sm" onClick={() => navigate("/login")}>
+                  <Button
+                      variant="outline"
+                      size="sm"
+                      className="border-primary text-primary hover:bg-primary hover:text-primary-foreground"
+                      onClick={() => navigate("/login")}
+                  >
                     Login
                   </Button>
                   <Button
                       size="sm"
-                      className="bg-gradient-primary text-primary-foreground"
+                      className="bg-primary text-primary-foreground hover:bg-primary/90"
                       onClick={() => navigate("/register")}
                   >
                     Sign Up
@@ -170,13 +175,14 @@ const Header = () => {
                       </>
                   ) : (
                       <>
-                        <Button variant="ghost" size="sm" className="w-full justify-start"
+                        <Button variant="outline" size="sm"
+                                className="w-full border-primary text-primary hover:bg-primary hover:text-primary-foreground"
                                 onClick={() => { navigate("/login"); setIsMenuOpen(false); }}>
                           Login
                         </Button>
                         <Button
                             size="sm"
-                            className="w-full bg-gradient-primary text-primary-foreground"
+                            className="w-full bg-primary text-primary-foreground hover:bg-primary/90"
                             onClick={() => { navigate("/register"); setIsMenuOpen(false); }}
                         >
                           Sign Up
