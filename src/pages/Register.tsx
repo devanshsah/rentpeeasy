@@ -123,7 +123,7 @@ const Register = () => {
                   <Input type="password" placeholder="Repeat your password" value={confirmPassword}
                          onChange={(e) => setConfirmPassword(e.target.value)} required autoComplete="new-password" />
                 </div>
-                <Button type="submit" className="w-full bg-gradient-primary text-primary-foreground" disabled={loading}>
+                <Button type="submit" className="w-full bg-primary text-primary-foreground hover:bg-primary/90" disabled={loading}>
                   {loading ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <UserPlus className="h-4 w-4 mr-2" />}
                   Create Account
                 </Button>
