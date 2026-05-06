@@ -29,7 +29,7 @@ import { api, type Property } from "@/lib/api";
 
 type NewPropertyForm = {
   title: string;
-  type: string;
+  type: import("@/lib/api").PropertyType;
   city: string;
   locality: string;
   price: string;
@@ -173,7 +173,7 @@ const OwnerDashboard = ({ user }: { user: AppUser }) => {
 
   const handleDelete = async (id: string | number) => {
     try {
-      await api.deleteProperty(id);
+      await api.deleteProperty(String(id));
       setProperties((prev) => prev.filter((p) => p.id !== id));
       toast({ title: "Property deleted" });
     } catch {
@@ -187,7 +187,7 @@ const OwnerDashboard = ({ user }: { user: AppUser }) => {
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold">Welcome, {user.name}</h1>
+            <h1 className="text-3xl font-bold">Welcome, {user.fullName || user.username}</h1>
             <p className="text-muted-foreground">Manage your properties</p>
           </div>
           <Button
@@ -381,7 +381,7 @@ const OwnerDashboard = ({ user }: { user: AppUser }) => {
                   <Label>Type *</Label>
                   <Select
                       value={form.type}
-                      onValueChange={(v) => setForm({ ...form, type: v })}
+                      onValueChange={(v) => setForm({ ...form, type: v as NewPropertyForm["type"] })}
                   >
                     <SelectTrigger>
                       <SelectValue />

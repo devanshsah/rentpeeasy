@@ -2,110 +2,134 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Search, MapPin, Home, Building, Briefcase, DollarSign } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Search, Truck, BadgePercent } from "lucide-react";
 import heroImage from "@/assets/hero-bg.jpg";
 
+type Tab = "buy" | "rent" | "commercial";
+
+const CITIES = [
+  "Bangalore",
+  "Mumbai",
+  "Delhi",
+  "Hyderabad",
+  "Pune",
+  "Chennai",
+  "Kolkata",
+  "Gurgaon",
+  "Noida",
+  "Ahmedabad",
+];
+
 const Hero = () => {
-  const [searchCity, setSearchCity] = useState("");
-  const [propertyType, setPropertyType] = useState("");
-  const [budgetRange, setBudgetRange] = useState("");
+  const [activeTab, setActiveTab] = useState<Tab>("rent");
+  const [city, setCity] = useState("Bangalore");
+  const [query, setQuery] = useState("");
   const navigate = useNavigate();
 
   const handleSearch = () => {
     const params = new URLSearchParams();
-    if (searchCity) params.set("q", searchCity);
-    if (propertyType) params.set("type", propertyType);
-    if (budgetRange) params.set("budget", budgetRange);
+    const q = [city, query].filter(Boolean).join(" ");
+    if (q) params.set("q", q);
+    if (activeTab === "commercial") params.set("type", "COMMERCIAL");
     navigate(`/properties?${params.toString()}`);
   };
 
+  const tabs: { id: Tab; label: string }[] = [
+    { id: "buy", label: "Buy" },
+    { id: "rent", label: "Rent" },
+    { id: "commercial", label: "Commercial" },
+  ];
+
   return (
     <section className="relative min-h-[600px] flex items-center justify-center overflow-hidden">
-      {/* Background Image */}
+      {/* Background */}
       <div
         className="absolute inset-0 z-0"
         style={{
           backgroundImage: `url(${heroImage})`,
           backgroundSize: "cover",
           backgroundPosition: "center",
-          backgroundRepeat: "no-repeat",
         }}
       >
-        <div className="absolute inset-0 bg-gradient-hero opacity-90"></div>
+        <div className="absolute inset-0 bg-gradient-hero opacity-90" />
       </div>
 
       {/* Content */}
-      <div className="relative z-10 container mx-auto px-4 text-center">
-        <div className="max-w-4xl mx-auto space-y-8 animate-fade-in">
-          <div className="space-y-4">
-            <h1 className="text-4xl md:text-6xl font-bold text-foreground">
-              Find Your Perfect 
-              <span className="block text-primary">Rental Home</span>
-            </h1>
-            <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto">
-              Discover PGs, Rooms, Flats & Commercial Spaces across India with zero brokerage
-            </p>
+      <div className="relative z-10 container mx-auto px-4">
+        <div className="max-w-4xl mx-auto space-y-8 animate-fade-in text-center">
+          <h1 className="text-3xl md:text-5xl font-bold text-foreground leading-tight">
+            World's Largest{" "}
+            <span className="text-primary">NoBrokerage</span> Property Site
+          </h1>
+
+          {/* Promo strip */}
+          <div className="inline-flex items-center gap-4 bg-primary-lightest/80 backdrop-blur px-5 py-2.5 rounded-lg text-sm text-foreground/80">
+            <span className="flex items-center gap-2">
+              <Truck className="h-4 w-4 text-primary" /> Packers And Movers
+            </span>
+            <span className="h-4 w-px bg-border" />
+            <span className="flex items-center gap-2">
+              <BadgePercent className="h-4 w-4 text-primary" /> Lowest Prices
+            </span>
           </div>
 
-          {/* Search Form */}
-          <div className="bg-card/95 backdrop-blur rounded-2xl p-6 shadow-large border">
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-                  <MapPin className="h-4 w-4" />
-                  City, Locality, Landmark
-                </label>
-                <Input
-                  placeholder="Search for locality, landmark, project"
-                  value={searchCity}
-                  onChange={(e) => setSearchCity(e.target.value)}
-                  className="border-border focus:ring-primary"
-                />
-              </div>
+          {/* Search Card */}
+          <div className="bg-card rounded-2xl shadow-large border max-w-3xl mx-auto overflow-hidden">
+            {/* Tabs */}
+            <div className="flex justify-center border-b">
+              {tabs.map((t) => (
+                <button
+                  key={t.id}
+                  onClick={() => setActiveTab(t.id)}
+                  className={`relative px-8 py-4 text-base font-semibold transition-colors ${
+                    activeTab === t.id
+                      ? "text-primary"
+                      : "text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  {t.label}
+                  {activeTab === t.id && (
+                    <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-12 h-1 bg-primary rounded-t" />
+                  )}
+                </button>
+              ))}
+            </div>
 
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-                  <Home className="h-4 w-4" />
-                  Property Type
-                </label>
-                <Select value={propertyType} onValueChange={setPropertyType}>
-                  <SelectTrigger className="border-border focus:ring-primary">
-                    <SelectValue placeholder="Select type" />
+            {/* Search Row */}
+            <div className="flex flex-col md:flex-row items-stretch">
+              <div className="md:w-44 border-b md:border-b-0 md:border-r border-border">
+                <Select value={city} onValueChange={setCity}>
+                  <SelectTrigger className="h-14 border-0 rounded-none focus:ring-0 text-base font-medium px-4">
+                    <SelectValue placeholder="Select city" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="pg">PG / Hostel</SelectItem>
-                    <SelectItem value="room">Single Room</SelectItem>
-                    <SelectItem value="flat">Flat / Apartment</SelectItem>
-                    <SelectItem value="commercial">Commercial Space</SelectItem>
-                    <SelectItem value="villa">Villa / House</SelectItem>
+                    {CITIES.map((c) => (
+                      <SelectItem key={c} value={c}>
+                        {c}
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </div>
 
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-                  <DollarSign className="h-4 w-4" />
-                  Budget Range
-                </label>
-                <Select value={budgetRange} onValueChange={setBudgetRange}>
-                  <SelectTrigger className="border-border focus:ring-primary">
-                    <SelectValue placeholder="Select budget" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="0-10k">₹0 - ₹10,000</SelectItem>
-                    <SelectItem value="10k-20k">₹10,000 - ₹20,000</SelectItem>
-                    <SelectItem value="20k-30k">₹20,000 - ₹30,000</SelectItem>
-                    <SelectItem value="30k-50k">₹30,000 - ₹50,000</SelectItem>
-                    <SelectItem value="50k+">₹50,000+</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+              <Input
+                placeholder="Search upto 3 localities or landmarks"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+                className="flex-1 h-14 border-0 rounded-none focus-visible:ring-0 text-base px-4"
+              />
 
               <Button
                 onClick={handleSearch}
-                size="lg"
-                className="bg-gradient-primary text-primary-foreground shadow-medium hover:shadow-large transition-all text-black"
+                className="h-14 px-8 rounded-none bg-primary hover:bg-primary/90 text-primary-foreground text-base font-semibold"
               >
                 <Search className="h-5 w-5 mr-2" />
                 Search
@@ -114,20 +138,20 @@ const Hero = () => {
           </div>
 
           {/* Stats */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
-            <div className="space-y-2">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center pt-4">
+            <div>
               <div className="text-2xl md:text-3xl font-bold text-primary">50K+</div>
               <div className="text-sm text-muted-foreground">Properties</div>
             </div>
-            <div className="space-y-2">
+            <div>
               <div className="text-2xl md:text-3xl font-bold text-primary">25+</div>
               <div className="text-sm text-muted-foreground">Cities</div>
             </div>
-            <div className="space-y-2">
+            <div>
               <div className="text-2xl md:text-3xl font-bold text-primary">1M+</div>
               <div className="text-sm text-muted-foreground">Happy Tenants</div>
             </div>
-            <div className="space-y-2">
+            <div>
               <div className="text-2xl md:text-3xl font-bold text-primary">99%</div>
               <div className="text-sm text-muted-foreground">Verified</div>
             </div>

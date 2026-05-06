@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { DemoUser } from "@/contexts/AuthContext";
+import { AppUser as DemoUser } from "@/contexts/AuthContext";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
@@ -129,7 +129,7 @@ const AdminDashboard = ({ user }: { user: DemoUser }) => {
     <div className="space-y-8">
       <div>
         <h1 className="text-3xl font-bold text-foreground">Admin Dashboard</h1>
-        <p className="text-muted-foreground">Platform overview & moderation · Welcome, {user.name}</p>
+        <p className="text-muted-foreground">Platform overview & moderation · Welcome, {user.fullName || user.username}</p>
       </div>
 
       {/* Platform Stats */}

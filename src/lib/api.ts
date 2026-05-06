@@ -144,6 +144,9 @@ export interface PropertyFilters {
 export type PropertyType = "PG" | "ROOM" | "APARTMENT" | "FLAT" | "VILLA" | "COMMERCIAL";
 export type UserRole = "USER" | "OWNER" | "ADMIN" | "TENANT";
 
+// Backwards-compat alias
+export type Property = PropertyDto;
+
 // ── Cloudinary image upload ───────────────────────────────────────────────────
 // 1. Sign up free at cloudinary.com
 // 2. Copy Cloud Name from dashboard
