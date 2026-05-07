@@ -7,8 +7,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Checkbox } from "@/components/ui/checkbox";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
-import { ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
-import { api, type PropertyType } from "@/lib/api";
+import { ChevronLeft, ChevronRight, Loader2, Upload, X, Video as VideoIcon } from "lucide-react";
+import { api, type PropertyType, uploadMediaToCloudinary } from "@/lib/api";
 import { useNavigate } from "react-router-dom";
 
 interface PostPropertyDialogProps {
@@ -48,16 +48,55 @@ const PostPropertyDialog = ({ open, onOpenChange }: PostPropertyDialogProps) => 
   const [description, setDescription] = useState("");
   const [selectedAmenities, setSelectedAmenities] = useState<string[]>([]);
 
+  // Media
+  const [images, setImages] = useState<string[]>([]);
+  const [videos, setVideos] = useState<string[]>([]);
+  const [uploading, setUploading] = useState(false);
+
   const toggleAmenity = (a: string) =>
       setSelectedAmenities((prev) =>
           prev.includes(a) ? prev.filter((x) => x !== a) : [...prev, a]
       );
+
+  const handleMediaUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files ?? []);
+    if (files.length === 0) return;
+    setUploading(true);
+    try {
+      for (const file of files) {
+        const isVideo = file.type.startsWith("video/");
+        const maxSize = isVideo ? 50 * 1024 * 1024 : 5 * 1024 * 1024;
+        if (file.size > maxSize) {
+          toast({
+            title: `${file.name} too large`,
+            description: isVideo ? "Videos must be under 50MB." : "Images must be under 5MB.",
+            variant: "destructive",
+          });
+          continue;
+        }
+        const url = await uploadMediaToCloudinary(file);
+        if (isVideo) setVideos((prev) => [...prev, url]);
+        else setImages((prev) => [...prev, url]);
+      }
+      toast({ title: "Upload complete" });
+    } catch (err) {
+      toast({
+        title: "Upload failed",
+        description: err instanceof Error ? err.message : "Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setUploading(false);
+      e.target.value = "";
+    }
+  };
 
   const reset = () => {
     setStep(1);
     setTitle(""); setPropertyType("APARTMENT"); setCity(""); setLocality("");
     setBeds(""); setBaths(""); setSquareFeet(""); setPrice(""); setContactNumber("");
     setDescription(""); setSelectedAmenities([]);
+    setImages([]); setVideos([]);
   };
 
   const handleClose = () => { reset(); onOpenChange(false); };
