@@ -83,9 +83,17 @@ const Header = () => {
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                       <Button variant="ghost" size="sm" className="flex items-center gap-2">
-                        <div className="w-7 h-7 bg-gradient-primary rounded-full flex items-center justify-center">
-                          <span className="text-xs font-bold text-primary-foreground">{initial}</span>
-                        </div>
+                        {user.avatarUrl ? (
+                          <img
+                            src={user.avatarUrl}
+                            alt={displayName}
+                            className="w-7 h-7 rounded-full object-cover border border-primary/30"
+                          />
+                        ) : (
+                          <div className="w-7 h-7 bg-gradient-primary rounded-full flex items-center justify-center">
+                            <span className="text-xs font-bold text-primary-foreground">{initial}</span>
+                          </div>
+                        )}
                         <span className="text-sm">{displayName.split(" ")[0]}</span>
                       </Button>
                     </DropdownMenuTrigger>
