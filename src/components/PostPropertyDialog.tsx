@@ -138,6 +138,7 @@ const PostPropertyDialog = ({ open, onOpenChange }: PostPropertyDialogProps) => 
         contactNumber: contactNumber.trim() || undefined,
         description: description.trim() || undefined,
         amenities: selectedAmenities.length > 0 ? selectedAmenities : undefined,
+        images: [...images, ...videos],
       });
 
       toast({
@@ -249,6 +250,56 @@ const PostPropertyDialog = ({ open, onOpenChange }: PostPropertyDialogProps) => 
                         <label className="text-sm">{a}</label>
                       </div>
                   ))}
+                </div>
+
+                {/* Media upload */}
+                <div className="space-y-2">
+                  <Label>Photos & Videos</Label>
+                  <label className="flex items-center justify-center gap-2 border-2 border-dashed border-muted-foreground/30 rounded-lg p-4 cursor-pointer hover:border-primary hover:bg-muted/30 transition-colors">
+                    {uploading ? (
+                      <><Loader2 className="h-4 w-4 animate-spin" /><span className="text-sm">Uploading...</span></>
+                    ) : (
+                      <><Upload className="h-4 w-4 text-primary" /><span className="text-sm">Click to upload images or videos</span></>
+                    )}
+                    <input
+                      type="file"
+                      accept="image/*,video/*"
+                      multiple
+                      className="hidden"
+                      onChange={handleMediaUpload}
+                      disabled={uploading}
+                    />
+                  </label>
+
+                  {(images.length > 0 || videos.length > 0) && (
+                    <div className="grid grid-cols-4 gap-2">
+                      {images.map((url, idx) => (
+                        <div key={`img-${idx}`} className="relative group aspect-square rounded-md overflow-hidden border">
+                          <img src={url} alt="" className="w-full h-full object-cover" />
+                          <button
+                            type="button"
+                            onClick={() => setImages((prev) => prev.filter((_, i) => i !== idx))}
+                            className="absolute top-1 right-1 bg-destructive text-destructive-foreground rounded-full p-0.5 opacity-0 group-hover:opacity-100 transition-opacity"
+                          >
+                            <X className="h-3 w-3" />
+                          </button>
+                        </div>
+                      ))}
+                      {videos.map((url, idx) => (
+                        <div key={`vid-${idx}`} className="relative group aspect-square rounded-md overflow-hidden border bg-muted flex items-center justify-center">
+                          <video src={url} className="w-full h-full object-cover" />
+                          <VideoIcon className="absolute h-6 w-6 text-white drop-shadow" />
+                          <button
+                            type="button"
+                            onClick={() => setVideos((prev) => prev.filter((_, i) => i !== idx))}
+                            className="absolute top-1 right-1 bg-destructive text-destructive-foreground rounded-full p-0.5 opacity-0 group-hover:opacity-100 transition-opacity"
+                          >
+                            <X className="h-3 w-3" />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
               </div>
           )}
