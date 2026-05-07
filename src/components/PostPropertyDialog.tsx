@@ -161,7 +161,7 @@ const PostPropertyDialog = ({ open, onOpenChange }: PostPropertyDialogProps) => 
 
   return (
       <Dialog open={open} onOpenChange={handleClose}>
-        <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-3xl max-h-[92vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Post a Property — Step {step} of 3</DialogTitle>
           </DialogHeader>
