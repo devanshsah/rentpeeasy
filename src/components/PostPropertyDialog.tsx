@@ -120,7 +120,6 @@ const PostPropertyDialog = ({ open, onOpenChange }: PostPropertyDialogProps) => 
   const handleNext = () => {
     if (step === 1 && validateStep1()) setStep(2);
     else if (step === 2 && validateStep2()) setStep(3);
-    else if (step === 3) setStep(4);
   };
 
   const handleSubmit = async () => {
