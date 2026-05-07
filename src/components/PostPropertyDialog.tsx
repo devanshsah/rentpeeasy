@@ -7,8 +7,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Checkbox } from "@/components/ui/checkbox";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
-import { ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
-import { api, type PropertyType } from "@/lib/api";
+import { ChevronLeft, ChevronRight, Loader2, Upload, X, Video as VideoIcon } from "lucide-react";
+import { api, type PropertyType, uploadMediaToCloudinary } from "@/lib/api";
 import { useNavigate } from "react-router-dom";
 
 interface PostPropertyDialogProps {
@@ -48,16 +48,55 @@ const PostPropertyDialog = ({ open, onOpenChange }: PostPropertyDialogProps) => 
   const [description, setDescription] = useState("");
   const [selectedAmenities, setSelectedAmenities] = useState<string[]>([]);
 
+  // Media
+  const [images, setImages] = useState<string[]>([]);
+  const [videos, setVideos] = useState<string[]>([]);
+  const [uploading, setUploading] = useState(false);
+
   const toggleAmenity = (a: string) =>
       setSelectedAmenities((prev) =>
           prev.includes(a) ? prev.filter((x) => x !== a) : [...prev, a]
       );
+
+  const handleMediaUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files ?? []);
+    if (files.length === 0) return;
+    setUploading(true);
+    try {
+      for (const file of files) {
+        const isVideo = file.type.startsWith("video/");
+        const maxSize = isVideo ? 50 * 1024 * 1024 : 5 * 1024 * 1024;
+        if (file.size > maxSize) {
+          toast({
+            title: `${file.name} too large`,
+            description: isVideo ? "Videos must be under 50MB." : "Images must be under 5MB.",
+            variant: "destructive",
+          });
+          continue;
+        }
+        const url = await uploadMediaToCloudinary(file);
+        if (isVideo) setVideos((prev) => [...prev, url]);
+        else setImages((prev) => [...prev, url]);
+      }
+      toast({ title: "Upload complete" });
+    } catch (err) {
+      toast({
+        title: "Upload failed",
+        description: err instanceof Error ? err.message : "Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setUploading(false);
+      e.target.value = "";
+    }
+  };
 
   const reset = () => {
     setStep(1);
     setTitle(""); setPropertyType("APARTMENT"); setCity(""); setLocality("");
     setBeds(""); setBaths(""); setSquareFeet(""); setPrice(""); setContactNumber("");
     setDescription(""); setSelectedAmenities([]);
+    setImages([]); setVideos([]);
   };
 
   const handleClose = () => { reset(); onOpenChange(false); };
@@ -99,6 +138,7 @@ const PostPropertyDialog = ({ open, onOpenChange }: PostPropertyDialogProps) => 
         contactNumber: contactNumber.trim() || undefined,
         description: description.trim() || undefined,
         amenities: selectedAmenities.length > 0 ? selectedAmenities : undefined,
+        images: [...images, ...videos],
       });
 
       toast({
@@ -210,6 +250,56 @@ const PostPropertyDialog = ({ open, onOpenChange }: PostPropertyDialogProps) => 
                         <label className="text-sm">{a}</label>
                       </div>
                   ))}
+                </div>
+
+                {/* Media upload */}
+                <div className="space-y-2">
+                  <Label>Photos & Videos</Label>
+                  <label className="flex items-center justify-center gap-2 border-2 border-dashed border-muted-foreground/30 rounded-lg p-4 cursor-pointer hover:border-primary hover:bg-muted/30 transition-colors">
+                    {uploading ? (
+                      <><Loader2 className="h-4 w-4 animate-spin" /><span className="text-sm">Uploading...</span></>
+                    ) : (
+                      <><Upload className="h-4 w-4 text-primary" /><span className="text-sm">Click to upload images or videos</span></>
+                    )}
+                    <input
+                      type="file"
+                      accept="image/*,video/*"
+                      multiple
+                      className="hidden"
+                      onChange={handleMediaUpload}
+                      disabled={uploading}
+                    />
+                  </label>
+
+                  {(images.length > 0 || videos.length > 0) && (
+                    <div className="grid grid-cols-4 gap-2">
+                      {images.map((url, idx) => (
+                        <div key={`img-${idx}`} className="relative group aspect-square rounded-md overflow-hidden border">
+                          <img src={url} alt="" className="w-full h-full object-cover" />
+                          <button
+                            type="button"
+                            onClick={() => setImages((prev) => prev.filter((_, i) => i !== idx))}
+                            className="absolute top-1 right-1 bg-destructive text-destructive-foreground rounded-full p-0.5 opacity-0 group-hover:opacity-100 transition-opacity"
+                          >
+                            <X className="h-3 w-3" />
+                          </button>
+                        </div>
+                      ))}
+                      {videos.map((url, idx) => (
+                        <div key={`vid-${idx}`} className="relative group aspect-square rounded-md overflow-hidden border bg-muted flex items-center justify-center">
+                          <video src={url} className="w-full h-full object-cover" />
+                          <VideoIcon className="absolute h-6 w-6 text-white drop-shadow" />
+                          <button
+                            type="button"
+                            onClick={() => setVideos((prev) => prev.filter((_, i) => i !== idx))}
+                            className="absolute top-1 right-1 bg-destructive text-destructive-foreground rounded-full p-0.5 opacity-0 group-hover:opacity-100 transition-opacity"
+                          >
+                            <X className="h-3 w-3" />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
               </div>
           )}

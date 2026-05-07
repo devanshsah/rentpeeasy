@@ -174,6 +174,26 @@ export async function uploadImageToCloudinary(file: File): Promise<string> {
   return data.secure_url as string;
 }
 
+export async function uploadMediaToCloudinary(file: File): Promise<string> {
+  if (!CLOUDINARY_CLOUD) {
+    throw new Error("Cloudinary not configured. Add VITE_CLOUDINARY_CLOUD_NAME to your .env file.");
+  }
+  const isVideo = file.type.startsWith("video/");
+  const resourceType = isVideo ? "video" : "image";
+  const formData = new FormData();
+  formData.append("file", file);
+  formData.append("upload_preset", CLOUDINARY_PRESET);
+  formData.append("folder", "rentpeeasy");
+
+  const res = await fetch(
+      `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD}/${resourceType}/upload`,
+      { method: "POST", body: formData }
+  );
+  const data = await res.json();
+  if (!res.ok || !data.secure_url) throw new Error(data.error?.message ?? "Media upload failed");
+  return data.secure_url as string;
+}
+
 // ── API methods ───────────────────────────────────────────────────────────────
 
 export const api = {

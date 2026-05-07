@@ -159,7 +159,7 @@ const PropertyDetail = () => {
                   {property.contactNumber ? (
                       <>
                         <a href={`tel:${property.contactNumber}`}>
-                          <Button className="w-full bg-gradient-primary text-primary-foreground"><Phone className="h-4 w-4 mr-2" />Call Owner</Button>
+                          <Button className="w-full bg-primary text-primary-foreground hover:bg-primary/90"><Phone className="h-4 w-4 mr-2" />Call Owner</Button>
                         </a>
                         <a href={`https://wa.me/${property.contactNumber.replace(/\D/g, "")}`} target="_blank" rel="noopener noreferrer">
                           <Button variant="outline" className="w-full"><MessageSquare className="h-4 w-4 mr-2" />WhatsApp</Button>
