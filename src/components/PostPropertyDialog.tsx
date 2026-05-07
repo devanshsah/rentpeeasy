@@ -233,33 +233,18 @@ const PostPropertyDialog = ({ open, onOpenChange }: PostPropertyDialogProps) => 
           {/* Step 3 */}
           {step === 3 && (
               <div className="space-y-4">
-                <Textarea
-                    rows={4}
-                    placeholder="Describe your property..."
-                    value={description}
-                    onChange={(e) => setDescription(e.target.value)}
-                />
-
-                <div className="grid grid-cols-2 gap-2 max-h-48 overflow-y-auto">
-                  {ALL_AMENITIES.map((a) => (
-                      <div key={a} className="flex items-center space-x-2">
-                        <Checkbox
-                            checked={selectedAmenities.includes(a)}
-                            onCheckedChange={() => toggleAmenity(a)}
-                        />
-                        <label className="text-sm">{a}</label>
-                      </div>
-                  ))}
-                </div>
-
-                {/* Media upload */}
+                {/* Media upload — moved to top for visibility */}
                 <div className="space-y-2">
-                  <Label>Photos & Videos</Label>
-                  <label className="flex items-center justify-center gap-2 border-2 border-dashed border-muted-foreground/30 rounded-lg p-4 cursor-pointer hover:border-primary hover:bg-muted/30 transition-colors">
+                  <Label>Property Photos & Videos *</Label>
+                  <label className="flex flex-col items-center justify-center gap-1 border-2 border-dashed border-primary/40 rounded-lg p-6 cursor-pointer hover:border-primary hover:bg-primary/5 transition-colors">
                     {uploading ? (
-                      <><Loader2 className="h-4 w-4 animate-spin" /><span className="text-sm">Uploading...</span></>
+                      <><Loader2 className="h-5 w-5 animate-spin text-primary" /><span className="text-sm font-medium">Uploading...</span></>
                     ) : (
-                      <><Upload className="h-4 w-4 text-primary" /><span className="text-sm">Click to upload images or videos</span></>
+                      <>
+                        <Upload className="h-6 w-6 text-primary" />
+                        <span className="text-sm font-medium">Click to upload property images or videos</span>
+                        <span className="text-xs text-muted-foreground">Images up to 5MB, Videos up to 50MB</span>
+                      </>
                     )}
                     <input
                       type="file"
@@ -279,7 +264,7 @@ const PostPropertyDialog = ({ open, onOpenChange }: PostPropertyDialogProps) => 
                           <button
                             type="button"
                             onClick={() => setImages((prev) => prev.filter((_, i) => i !== idx))}
-                            className="absolute top-1 right-1 bg-destructive text-destructive-foreground rounded-full p-0.5 opacity-0 group-hover:opacity-100 transition-opacity"
+                            className="absolute top-1 right-1 bg-destructive text-destructive-foreground rounded-full p-0.5"
                           >
                             <X className="h-3 w-3" />
                           </button>
@@ -292,7 +277,7 @@ const PostPropertyDialog = ({ open, onOpenChange }: PostPropertyDialogProps) => 
                           <button
                             type="button"
                             onClick={() => setVideos((prev) => prev.filter((_, i) => i !== idx))}
-                            className="absolute top-1 right-1 bg-destructive text-destructive-foreground rounded-full p-0.5 opacity-0 group-hover:opacity-100 transition-opacity"
+                            className="absolute top-1 right-1 bg-destructive text-destructive-foreground rounded-full p-0.5"
                           >
                             <X className="h-3 w-3" />
                           </button>
@@ -300,6 +285,28 @@ const PostPropertyDialog = ({ open, onOpenChange }: PostPropertyDialogProps) => 
                       ))}
                     </div>
                   )}
+                </div>
+
+                <Textarea
+                    rows={4}
+                    placeholder="Describe your property..."
+                    value={description}
+                    onChange={(e) => setDescription(e.target.value)}
+                />
+
+                <div className="space-y-2">
+                  <Label>Amenities</Label>
+                  <div className="grid grid-cols-2 gap-2 max-h-40 overflow-y-auto border rounded-md p-2">
+                    {ALL_AMENITIES.map((a) => (
+                        <div key={a} className="flex items-center space-x-2">
+                          <Checkbox
+                              checked={selectedAmenities.includes(a)}
+                              onCheckedChange={() => toggleAmenity(a)}
+                          />
+                          <label className="text-sm">{a}</label>
+                        </div>
+                    ))}
+                  </div>
                 </div>
               </div>
           )}
