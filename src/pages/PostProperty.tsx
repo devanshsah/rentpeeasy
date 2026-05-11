@@ -14,6 +14,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
 import {
@@ -734,19 +735,76 @@ const PostProperty = () => {
               <p className="text-xs text-muted-foreground text-center mt-1 mb-4">
                 Subscribe to our owner plans and find tenants quickly and with ease
               </p>
-              <div className="grid grid-cols-2 gap-3 text-center">
+
+              <Accordion type="single" collapsible className="w-full">
                 {[
-                  { icon: ShieldCheck, label: "Privacy" },
-                  { icon: Star, label: "Promoted Listing" },
-                  { icon: TrendingUp, label: "Social Marketing" },
-                  { icon: Sparkles, label: "Price Consultation" },
+                  {
+                    icon: ShieldCheck,
+                    label: "Privacy",
+                    q: "What stays private?",
+                    items: [
+                      "Your phone number is masked from public view",
+                      "Choose preferred contact hours",
+                      "Hide exact flat / door number on listing",
+                      "Allow contact only from verified tenants",
+                    ],
+                  },
+                  {
+                    icon: Star,
+                    label: "Promoted Listing",
+                    q: "What do we need to promote your listing?",
+                    items: [
+                      "High quality photos (min 5) and a short walkthrough video",
+                      "Complete amenities and society details",
+                      "Accurate rent, deposit and availability date",
+                      "A short, catchy property description",
+                    ],
+                  },
+                  {
+                    icon: TrendingUp,
+                    label: "Social Marketing",
+                    q: "What we'll use for social ads?",
+                    items: [
+                      "Cover photo and 2–3 highlight images",
+                      "One-line headline (e.g. 2BHK near Metro)",
+                      "Target locality and tenant preference",
+                      "Owner consent to run paid promotions",
+                    ],
+                  },
+                  {
+                    icon: Sparkles,
+                    label: "Price Consultation",
+                    q: "What helps us suggest the right price?",
+                    items: [
+                      "Built-up area and configuration (BHK)",
+                      "Furnishing status and age of property",
+                      "Floor, facing and parking details",
+                      "Expected rent and deposit range",
+                    ],
+                  },
                 ].map((b) => (
-                  <div key={b.label} className="rounded-lg border p-3 hover:border-primary hover:shadow-sm transition">
-                    <b.icon className="h-6 w-6 mx-auto text-primary" />
-                    <div className="text-xs mt-2 font-medium">{b.label}</div>
-                  </div>
+                  <AccordionItem key={b.label} value={b.label} className="border rounded-lg mb-2 px-3">
+                    <AccordionTrigger className="hover:no-underline py-3">
+                      <div className="flex items-center gap-2 text-left">
+                        <b.icon className="h-5 w-5 text-primary shrink-0" />
+                        <span className="text-sm font-semibold">{b.label}</span>
+                      </div>
+                    </AccordionTrigger>
+                    <AccordionContent>
+                      <p className="text-xs font-medium text-foreground mb-2">{b.q}</p>
+                      <ul className="space-y-1.5">
+                        {b.items.map((it) => (
+                          <li key={it} className="flex items-start gap-2 text-xs text-muted-foreground">
+                            <Check className="h-3.5 w-3.5 text-primary mt-0.5 shrink-0" />
+                            <span>{it}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </AccordionContent>
+                  </AccordionItem>
                 ))}
-              </div>
+              </Accordion>
+
               <Button className="w-full mt-4 bg-primary text-primary-foreground">Show Interest</Button>
             </div>
           </aside>
