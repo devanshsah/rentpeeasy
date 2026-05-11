@@ -10,7 +10,6 @@ import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem,
   DropdownMenuSeparator, DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import PostPropertyDialog from "./PostPropertyDialog";
 
 const navItems = [
   { path: "/", label: "Home", icon: Home },
@@ -22,7 +21,6 @@ const navItems = [
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [postPropertyOpen, setPostPropertyOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
   const { user, isAuthenticated, logout } = useAuth();
@@ -73,7 +71,7 @@ const Header = () => {
                       <Button
                           size="sm"
                           className="bg-green-500 hover:bg-green-600 text-white"
-                          onClick={() => setPostPropertyOpen(true)}
+                          onClick={() => navigate("/post-property")}
                       >
                         Post Property
                       </Button>
@@ -163,7 +161,7 @@ const Header = () => {
                             <Button
                                 className="w-full bg-green-500 hover:bg-green-600 text-white"
                                 size="sm"
-                                onClick={() => { setPostPropertyOpen(true); setIsMenuOpen(false); }}
+                                onClick={() => { navigate("/post-property"); setIsMenuOpen(false); }}
                             >
                               Post Property
                             </Button>
@@ -202,7 +200,6 @@ const Header = () => {
             </div>
         )}
 
-        <PostPropertyDialog open={postPropertyOpen} onOpenChange={setPostPropertyOpen} />
       </header>
   );
 };
