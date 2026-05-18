@@ -15,6 +15,8 @@ import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
 import Profile from "./pages/Profile";
 import PostProperty from "./pages/PostProperty";
+import PostPropertyStart from "./pages/PostPropertyStart";
+import PostPg from "./pages/PostPg";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -37,7 +39,9 @@ const App = () => (
             <Route path="/register" element={<Register />} />
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/profile" element={<Profile />} />
-            <Route path="/post-property" element={<PostProperty />} />
+            <Route path="/post-property" element={<PostPropertyStart />} />
+            <Route path="/post-property/flat" element={<PostProperty />} />
+            <Route path="/post-property/pg" element={<PostPg />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
