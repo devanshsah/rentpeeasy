@@ -60,6 +60,7 @@ const PIE_COLORS = ["hsl(221,83%,53%)", "hsl(142,76%,36%)", "hsl(38,92%,50%)"];
 
 const OwnerDashboard = ({ user }: { user: AppUser }) => {
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   const [properties, setProperties] = useState<Property[]>([]);
   const [loading, setLoading] = useState(true);
