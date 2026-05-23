@@ -194,11 +194,12 @@ const OwnerDashboard = ({ user }: { user: AppUser }) => {
           </div>
           <Button
               className="bg-gradient-primary text-primary-foreground"
-              onClick={openCreate}
+              onClick={() => navigate("/post-property")}
           >
             <Plus className="h-4 w-4 mr-2" /> Add Property
           </Button>
         </div>
+
 
         {/* Stats */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
