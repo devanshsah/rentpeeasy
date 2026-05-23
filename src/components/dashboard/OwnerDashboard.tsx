@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -59,6 +60,7 @@ const PIE_COLORS = ["hsl(221,83%,53%)", "hsl(142,76%,36%)", "hsl(38,92%,50%)"];
 
 const OwnerDashboard = ({ user }: { user: AppUser }) => {
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   const [properties, setProperties] = useState<Property[]>([]);
   const [loading, setLoading] = useState(true);
@@ -192,11 +194,12 @@ const OwnerDashboard = ({ user }: { user: AppUser }) => {
           </div>
           <Button
               className="bg-gradient-primary text-primary-foreground"
-              onClick={openCreate}
+              onClick={() => navigate("/post-property")}
           >
             <Plus className="h-4 w-4 mr-2" /> Add Property
           </Button>
         </div>
+
 
         {/* Stats */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -287,7 +290,7 @@ const OwnerDashboard = ({ user }: { user: AppUser }) => {
                   <p className="text-muted-foreground mb-4">
                     You haven't listed any properties yet.
                   </p>
-                  <Button variant="outline" onClick={openCreate}>
+                  <Button variant="outline" onClick={() => navigate("/post-property")}>
                     <Plus className="h-4 w-4 mr-2" /> Add your first property
                   </Button>
                 </div>
