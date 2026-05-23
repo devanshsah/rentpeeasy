@@ -290,7 +290,7 @@ const OwnerDashboard = ({ user }: { user: AppUser }) => {
                   <p className="text-muted-foreground mb-4">
                     You haven't listed any properties yet.
                   </p>
-                  <Button variant="outline" onClick={openCreate}>
+                  <Button variant="outline" onClick={() => navigate("/post-property")}>
                     <Plus className="h-4 w-4 mr-2" /> Add your first property
                   </Button>
                 </div>
